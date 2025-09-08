@@ -1,29 +1,24 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { Redirect, Stack } from 'expo-router';
+import React from 'react';
+import { useAuth } from '../hooks/useAuth';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+export default function Layout() {
+  const { isAuthenticated, loading } = useAuth();
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  if (loading) {
+    return null; // Or a loading spinner
+  }
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
+  if (!isAuthenticated) {
+    return <Redirect href="/login" />;
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Stack>
+      <Stack.Screen name="index" options={{ title: 'Diamond Plays' }} />
+      <Stack.Screen name="login" options={{ title: 'Login' }} />
+      <Stack.Screen name="register" options={{ title: 'Sign Up' }} />
+      <Stack.Screen name="home" options={{ title: 'Home' }} />
+    </Stack>
   );
 }
