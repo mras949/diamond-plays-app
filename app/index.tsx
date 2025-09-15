@@ -1,52 +1,88 @@
+import axios from 'axios';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Button, Text, TextInput } from 'react-native-paper';
+import { API_BASE_URL } from '../constants/api';
+import { useAuth } from '../providers/AuthProvider';
 
-export default function WelcomeScreen() {
+const LoginScreen: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const router = useRouter();
+  const { login } = useAuth();
+
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
+      await login(response.data.token);
+      router.push('/home');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Login failed. Check your credentials.');
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to Diamond Plays!</Text>
-      <Text style={styles.subtitle}>Your Fantasy Baseball Adventure Starts Here</Text>
-      <TouchableOpacity style={styles.button} onPress={() => router.push('./login')}>
-        <Text style={styles.buttonText}>Log In</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => router.push('./register')}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
+      <Text style={styles.title}>Login</Text>
+      <TextInput
+        label="Email"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        style={styles.input}
+      />
+      <TextInput
+        label="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        style={styles.input}
+      />
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      <Button mode="contained" onPress={handleLogin} style={styles.button}>
+        Login
+      </Button>
+      <Text style={styles.link} onPress={() => router.push('/register')}>
+        Don’t have an account? Sign up
+      </Text>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    padding: 20,
     backgroundColor: '#ffffff',
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#000000',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666666',
-    marginTop: 10,
+    textAlign: 'center',
     marginBottom: 20,
   },
-  button: {
-    backgroundColor: '#0066cc',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginVertical: 10,
+  input: {
+    marginBottom: 15,
+    backgroundColor: '#f9f9f9',
   },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  error: {
+    color: '#ff0000',
+    textAlign: 'center',
+    marginBottom: 15,
+  },
+  button: {
+    marginVertical: 10,
+    backgroundColor: '#0066cc',
+  },
+  link: {
+    color: '#0066cc',
+    textAlign: 'center',
+    marginTop: 15,
   },
 });
+
+export default LoginScreen;

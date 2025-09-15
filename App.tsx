@@ -1,15 +1,17 @@
-import 'expo-dev-client'; // Enable development client for Expo Router
+import 'expo-dev-client';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
+import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { theme } from './constants/theme';
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
-    'DM Sans': require('@expo-google-fonts/dm-sans/static/DMSans-Regular.ttf'),
-    'DM Sans Medium': require('@expo-google-fonts/dm-sans/static/DMSans-Medium.ttf'),
-    'DM Sans Bold': require('@expo-google-fonts/dm-sans/static/DMSans-Bold.ttf'),
+    'DMSans-Regular': require('@expo-google-fonts/dm-sans/static/DMSans-Regular.ttf'),
+    'DMSans-Medium': require('@expo-google-fonts/dm-sans/static/DMSans-Medium.ttf'),
+    'DMSans-Bold': require('@expo-google-fonts/dm-sans/static/DMSans-Bold.ttf'),
   });
 
   useEffect(() => {
@@ -18,15 +20,17 @@ export default function App() {
 
   if (!fontsLoaded) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
-        <ActivityIndicator size="large" color="#000000" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background }}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
 
   return (
     <SafeAreaProvider>
-      <Stack />
+      <PaperProvider theme={theme}>
+  <Stack />
+      </PaperProvider>
     </SafeAreaProvider>
   );
 }

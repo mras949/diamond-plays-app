@@ -3,7 +3,8 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
-import { useAuth } from '../hooks/useAuth';
+import { API_BASE_URL } from '../constants/api';
+import { useAuth } from '../providers/AuthProvider';
 
 const RegisterScreen: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -14,9 +15,9 @@ const RegisterScreen: React.FC = () => {
 
   const handleRegister = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', { email, password });
-      await login(response.data.token); // Assume register returns a token (adjust if different)
-      router.push('./home');
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, { email, password });
+      await login(response.data.token); // Assume register returns a token
+      router.push('/home');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed. Try a different email.');
     }
@@ -43,7 +44,7 @@ const RegisterScreen: React.FC = () => {
       <Button mode="contained" onPress={handleRegister} style={styles.button}>
         Register
       </Button>
-      <Text style={styles.link} onPress={() => router.push('./login')}>
+      <Text style={styles.link} onPress={() => router.push('/')}>
         Already have an account? Log in
       </Text>
     </View>
