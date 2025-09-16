@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from 'react';
 type AuthContextType = {
   isAuthenticated: boolean;
   loading: boolean;
+  logoutLoading: boolean;
   login: (token: string) => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -13,6 +14,7 @@ const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [hasChecked, setHasChecked] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
   const loading = !hasChecked;
 
   // Handle auth state
@@ -27,13 +29,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const logout = React.useCallback(async () => {
+    if (logoutLoading) return; // Prevent multiple logout calls
+    
     try {
+      setLogoutLoading(true);
       await SecureStore.deleteItemAsync('jwtToken');
       setIsAuthenticated(false);
     } catch (error) {
       console.error('Logout error:', error);
+    } finally {
+      setLogoutLoading(false);
     }
-  }, []);
+  }, [logoutLoading]);
 
   // Initial auth check
   useEffect(() => {
@@ -65,9 +72,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const contextValue = React.useMemo(() => ({
     isAuthenticated: !!isAuthenticated,
     loading,
+    logoutLoading,
     login,
     logout
-  }), [isAuthenticated, loading, login, logout]);
+  }), [isAuthenticated, loading, logoutLoading, login, logout]);
 
   return (
     <AuthContext.Provider value={contextValue}>

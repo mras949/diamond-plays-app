@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
+import { RegisterModal } from '../components/RegisterModal';
 import { API_BASE_URL } from '../constants/api';
 import { useAuth } from '../providers/AuthProvider';
 
@@ -10,6 +11,7 @@ const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [registerModalVisible, setRegisterModalVisible] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
 
@@ -24,30 +26,37 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        style={styles.input}
+    <>
+      <View style={styles.container}>
+        <Text style={styles.title}>Diamond Plays</Text>
+        <TextInput
+          label="Email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          style={styles.input}
+        />
+        <TextInput
+          label="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          style={styles.input}
+        />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <Button mode="contained" onPress={handleLogin} style={styles.button}>
+          Login
+        </Button>
+        <Text style={styles.link} onPress={() => setRegisterModalVisible(true)}>
+          Don’t have an account? Sign up
+        </Text>
+      </View>
+      <RegisterModal
+        visible={registerModalVisible}
+        onClose={() => setRegisterModalVisible(false)}
+        onSwitchToLogin={() => setRegisterModalVisible(false)}
       />
-      <TextInput
-        label="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button mode="contained" onPress={handleLogin} style={styles.button}>
-        Login
-      </Button>
-      <Text style={styles.link} onPress={() => router.push('/register')}>
-        Don’t have an account? Sign up
-      </Text>
-    </View>
+    </>
   );
 };
 
@@ -60,14 +69,15 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '200',
     color: '#000000',
     textAlign: 'center',
     marginBottom: 20,
   },
   input: {
+    fontSize: 14,
     marginBottom: 15,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#ffffff',
   },
   error: {
     color: '#ff0000',

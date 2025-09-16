@@ -5,7 +5,7 @@ export const theme = {
   colors: {
     ...MD3LightTheme.colors,
     primary: '#3b82f6', // Blue-500 (Shadcn primary)
-    background: '#f4f4f5', // Zinc-100
+    background: '#ffffff', // Zinc-100
     surface: '#ffffff', // White for cards
     text: '#18181b', // Zinc-900
     secondary: '#71717a', // Zinc-500
@@ -14,15 +14,15 @@ export const theme = {
   },
   fonts: {
     ...MD3LightTheme.fonts,
-    bodyLarge: { fontFamily: 'DMSans-Regular', fontWeight: '400' as const, fontSize: 16 },
-    bodyMedium: { fontFamily: 'DMSans-Regular', fontWeight: '400' as const, fontSize: 14 },
-    bodySmall: { fontFamily: 'DMSans-Regular', fontWeight: '400' as const, fontSize: 12 },
-    labelLarge: { fontFamily: 'DMSans-Medium', fontWeight: '500' as const, fontSize: 14 },
-    labelMedium: { fontFamily: 'DMSans-Medium', fontWeight: '500' as const, fontSize: 12 },
-    labelSmall: { fontFamily: 'DMSans-Medium', fontWeight: '500' as const, fontSize: 10 },
-    headlineLarge: { fontFamily: 'DMSans-Bold', fontWeight: '700' as const, fontSize: 32 },
-    headlineMedium: { fontFamily: 'DMSans-Bold', fontWeight: '700' as const, fontSize: 24 },
-    headlineSmall: { fontFamily: 'DMSans-Bold', fontWeight: '700' as const, fontSize: 20 },
+    bodyLarge: { fontFamily: 'DMSans-Regular', fontWeight: '400' as const, fontSize: 14 },
+    bodyMedium: { fontFamily: 'DMSans-Regular', fontWeight: '400' as const, fontSize: 12 },
+    bodySmall: { fontFamily: 'DMSans-Regular', fontWeight: '400' as const, fontSize: 10 },
+    labelLarge: { fontFamily: 'DMSans-Medium', fontWeight: '500' as const, fontSize: 12 },
+    labelMedium: { fontFamily: 'DMSans-Medium', fontWeight: '500' as const, fontSize: 14 },
+    labelSmall: { fontFamily: 'DMSans-Medium', fontWeight: '500' as const, fontSize: 8 },
+    headlineLarge: { fontFamily: 'DMSans-Bold', fontWeight: '700' as const, fontSize: 30 },
+    headlineMedium: { fontFamily: 'DMSans-Bold', fontWeight: '700' as const, fontSize: 22 },
+    headlineSmall: { fontFamily: 'DMSans-Bold', fontWeight: '700' as const, fontSize: 18 },
   },
   spacing: {
     xs: 4,
@@ -55,8 +55,8 @@ export const theme = {
   components: {
     // Common layout styles
     container: {
-      flex: 1,
-      backgroundColor: '#f4f4f5', // theme.colors.background
+      flex: 1, // theme.colors.background
+      backgroundColor: '#ffffff',
     },
     scrollContainer: {
       flex: 1,
@@ -72,8 +72,8 @@ export const theme = {
     loadingContainer: {
       flex: 1,
       justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#f4f4f5', // theme.colors.background
+      alignItems: 'center', // theme.colors.background
+      backgroundColor: '#ffffff',
     },
 
     // Empty states
@@ -93,30 +93,24 @@ export const theme = {
     // Game/Accordion styles
     accordion: {
       marginBottom: 16, // theme.spacing.md
-      backgroundColor: '#ffffff', // theme.colors.surface
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 4,
-      elevation: 4,
     },
     expandedContent: {
-      padding: 16, // theme.spacing.md
+      padding: 0, // theme.spacing.md
     },
 
     // Tab styles
     tabViewContainer: {
       height: 350,
-      backgroundColor: '#f4f4f5', // theme.colors.background
       marginTop: 8, // theme.spacing.sm
+      backgroundColor: '#ffffff',
     },
     tabBar: {
-      backgroundColor: '#ffffff', // theme.colors.surface
       elevation: 0,
       shadowOpacity: 0,
       borderBottomWidth: 1,
       borderBottomColor: '#e5e5e5', // theme.colors.outline (assuming default)
       height: 48,
+      backgroundColor: '#ffffff',
     },
     tabIndicator: {
       backgroundColor: '#3b82f6', // theme.colors.primary
@@ -127,8 +121,8 @@ export const theme = {
     },
     tabContent: {
       flex: 1,
-      padding: 8, // theme.spacing.sm
-      backgroundColor: '#f4f4f5', // theme.colors.background
+      padding: 0, // theme.spacing.sm
+      backgroundColor: '#ffffff',
     },
 
     // Player list styles
@@ -138,7 +132,8 @@ export const theme = {
       alignItems: 'center',
       padding: 8, // theme.spacing.sm
       borderBottomWidth: 1,
-      borderBottomColor: '#71717a', // theme.colors.secondary
+      borderBottomColor: '#e5e5e5', // theme.colors.secondary
+      backgroundColor: '#ffffff',
     },
     playerInfo: {
       flexDirection: 'row',
@@ -149,21 +144,21 @@ export const theme = {
       width: 30,
       textAlign: 'center',
       fontFamily: 'DMSans-Regular', // theme.fonts.bodyMedium.fontFamily
-      fontSize: 14, // theme.fonts.bodyMedium.fontSize
+      fontSize: 12, // theme.fonts.bodyMedium.fontSize
       color: '#71717a', // theme.colors.secondary
     },
     playerName: {
       flex: 1,
       marginLeft: 8, // theme.spacing.sm
       fontFamily: 'DMSans-Regular', // theme.fonts.bodyLarge.fontFamily
-      fontSize: 16, // theme.fonts.bodyLarge.fontSize
+      fontSize: 12, // theme.fonts.bodyLarge.fontSize
       color: '#18181b', // theme.colors.text
     },
     playerPosition: {
       width: 50,
       textAlign: 'right',
       fontFamily: 'DMSans-Regular', // theme.fonts.bodyMedium.fontFamily
-      fontSize: 14, // theme.fonts.bodyMedium.fontSize
+      fontSize: 12, // theme.fonts.bodyMedium.fontSize
       color: '#71717a', // theme.colors.secondary
     },
 
@@ -173,7 +168,7 @@ export const theme = {
       justifyContent: 'center',
       alignItems: 'center',
       padding: 16, // theme.spacing.md
-      backgroundColor: '#f4f4f5', // theme.colors.background
+      backgroundColor: '#ffffff', // theme.colors.background
     },
   },
 };

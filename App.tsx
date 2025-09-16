@@ -1,6 +1,6 @@
 import 'expo-dev-client';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Slot } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
@@ -29,7 +29,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <PaperProvider theme={theme}>
-  <Stack />
+        <Slot />
       </PaperProvider>
     </SafeAreaProvider>
   );

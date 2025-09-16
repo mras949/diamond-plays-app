@@ -3,10 +3,10 @@ import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { AuthProvider, useAuth } from '../providers/AuthProvider';
 
-function AuthenticationGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, loading } = useAuth();
+function AuthenticationGuard() {
+  const { isAuthenticated, loading, logoutLoading } = useAuth();
 
-  if (loading) {
+  if (loading || logoutLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f4f4f5' }}>
         <ActivityIndicator size="large" color="#3b82f6" />
@@ -15,15 +15,14 @@ function AuthenticationGuard({ children }: { children: React.ReactNode }) {
   }
 
   // Once we've checked auth status and user is not authenticated, show login
-  if (!isAuthenticated && !loading) {
+  if (!isAuthenticated && !loading && !logoutLoading) {
     return <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" options={{ title: 'Login' }} />
-      <Stack.Screen name="register" options={{ title: 'Sign Up' }} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
     </Stack>
   }
 
   // User is authenticated, show protected routes
-  return <Stack screenOptions={{ headerLeft: undefined }}>
+  return <Stack screenOptions={{ headerShown: false }}>
     <Stack.Screen name="home" options={{ headerShown: false }} />
   </Stack>;
 }
@@ -31,13 +30,7 @@ function AuthenticationGuard({ children }: { children: React.ReactNode }) {
 export default function Layout() {
   return (
     <AuthProvider>
-      <AuthenticationGuard>
-        <Stack>
-          <Stack.Screen name="index" options={{ title: 'Diamond Plays' }} />
-          <Stack.Screen name="register" options={{ title: 'Sign Up' }} />
-          <Stack.Screen name="home" options={{ title: 'Today\'s Games' }} />
-        </Stack>
-      </AuthenticationGuard>
+      <AuthenticationGuard />
     </AuthProvider>
   );
 }

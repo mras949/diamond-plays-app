@@ -7,6 +7,7 @@ export interface Team {
   name: string;
   abbreviation: string;
   city: string;
+  teamName: string;
   league: 'AL' | 'NL';
   division: string;
   players: string[]; // Player IDs
