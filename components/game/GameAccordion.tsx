@@ -1,10 +1,58 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Dimensions, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SceneMap, TabView } from 'react-native-tab-view';
 import { GameAccordionProps } from '../../constants/interfaces';
 import { theme } from '../../constants/theme';
+import { useGameData } from '../../contexts/GameDataContext';
+import { useAuth } from '../../providers/AuthProvider';
 import { PlayerList } from './PlayerList';
+
+// Helper function to format game status display
+const getGameStatusDisplay = (game: any): string => {
+    switch (game.status) {
+        case 'in_progress':
+            return 'Live';
+        case 'completed':
+            return 'Final';
+        case 'scheduled':
+            return 'Game Time';
+        case 'postponed':
+            return 'Postponed';
+        case 'delayed':
+            return 'Delayed';
+        case 'suspended':
+            return 'Suspended';
+        default:
+            return game.status || 'Unknown';
+    }
+};
+
+// Helper function to format game time/inning display
+const getGameTimeDisplay = (game: any): string => {
+    if (game.status === 'completed') {
+        return ''; // No time for completed games
+    }
+    
+    if (game.status === 'in_progress') {
+        // Combine inning state and inning ordinal for live games
+        if (game.inningState && game.inningOrdinal) {
+            return `${game.inningState} ${game.inningOrdinal}`;
+        } else if (game.inningOrdinal) {
+            return game.inningOrdinal;
+        }
+    }
+    
+    // For scheduled games, show the time
+    if (game.dateTime) {
+        return new Date(game.dateTime).toLocaleTimeString([], { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    }
+    
+    return '';
+};
 
 const CustomTabBar = ({ navigationState, jumpTo, position }: any) => {
     return (
@@ -40,33 +88,57 @@ const CustomTabBar = ({ navigationState, jumpTo, position }: any) => {
     );
 };
 
-export const GameAccordion: React.FC<GameAccordionProps> = ({
+const GameAccordionComponent: React.FC<GameAccordionProps> = ({
     game,
     isExpanded,
     onToggleExpand,
     tabIndex,
     onTabChange,
-    onSelectionChange,
 }) => {
-    const AwayTab = () => (
+    const { isAuthenticated } = useAuth();
+    const { selectedPlayers, selectPlayer } = useGameData();
+
+    // Update selections when onSelectionChange is called
+    const handleSelectionChange = useCallback(async (selection: { gameId: string; teamId: string; playerId: string }) => {
+        try {
+            await selectPlayer(selection.playerId);
+        } catch (error) {
+            console.error('Error saving player selection:', error);
+        }
+    }, [selectPlayer]);
+
+    // Memoize tab components to prevent re-renders
+    const AwayTab = useCallback(() => (
         <View style={styles.tabContent}>
             <PlayerList
                 gameId={game._id}
                 teamId={game.awayTeam._id}
-                onSelectionChange={onSelectionChange}
+                onSelectionChange={handleSelectionChange}
             />
         </View>
-    );
+    ), [game._id, game.awayTeam._id, handleSelectionChange]);
 
-    const HomeTab = () => (
+    const HomeTab = useCallback(() => (
         <View style={styles.tabContent}>
             <PlayerList
                 gameId={game._id}
                 teamId={game.homeTeam._id}
-                onSelectionChange={onSelectionChange}
+                onSelectionChange={handleSelectionChange}
             />
         </View>
-    );
+    ), [game._id, game.homeTeam._id, handleSelectionChange]);
+
+    // Memoize routes to prevent TabView re-renders
+    const routes = useMemo(() => [
+        { key: 'away', title: game.awayTeam.name },
+        { key: 'home', title: game.homeTeam.name }
+    ], [game.awayTeam.name, game.homeTeam.name]);
+
+    // Memoize scene map
+    const renderScene = useMemo(() => SceneMap({
+        away: AwayTab,
+        home: HomeTab,
+    }), [AwayTab, HomeTab]);
 
     return (
         <View style={styles.container}>
@@ -83,14 +155,27 @@ export const GameAccordion: React.FC<GameAccordionProps> = ({
                         <Text variant="titleMedium" style={styles.teamName}>
                             {game.awayTeam.teamName}
                         </Text>
+                        {selectedPlayers[game.awayTeam._id] ? (
+                            <Text variant="bodySmall" style={styles.selectedPlayer}>
+                                {selectedPlayers[game.awayTeam._id]?.name || 
+                                 selectedPlayers[game.awayTeam._id]?.player?.name || 
+                                 'Selected Player'}
+                            </Text>
+                        ) : (
+                            <Text variant="bodySmall" style={styles.noSelection}>
+                                No Selection
+                            </Text>
+                        )}
                     </View>
                     <View style={styles.centerSection}>
                         <Text variant="bodyMedium" style={styles.gameStatus}>
-                            {game.status}
+                            {getGameStatusDisplay(game)}
                         </Text>
-                        <Text variant="bodyMedium" style={styles.gameDateTime}>
-                            {new Date(game.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </Text>
+                        {getGameTimeDisplay(game) && (
+                            <Text variant="bodyMedium" style={styles.gameDateTime}>
+                                {getGameTimeDisplay(game)}
+                            </Text>
+                        )}
                     </View>
                     <View style={styles.homeTeamSection}>
                         <Text variant="titleMedium" style={styles.teamCity}>
@@ -99,6 +184,17 @@ export const GameAccordion: React.FC<GameAccordionProps> = ({
                         <Text variant="titleMedium" style={styles.teamName}>
                             {game.homeTeam.teamName}
                         </Text>
+                        {selectedPlayers[game.homeTeam._id] ? (
+                            <Text variant="bodySmall" style={styles.selectedPlayer}>
+                                {selectedPlayers[game.homeTeam._id]?.name || 
+                                 selectedPlayers[game.homeTeam._id]?.player?.name || 
+                                 'Selected Player'}
+                            </Text>
+                        ) : (
+                            <Text variant="bodySmall" style={styles.noSelection}>
+                                No Selection
+                            </Text>
+                        )}
                     </View>
                 </View>
             </TouchableOpacity>
@@ -109,15 +205,9 @@ export const GameAccordion: React.FC<GameAccordionProps> = ({
                         <TabView
                             navigationState={{
                                 index: tabIndex,
-                                routes: [
-                                    { key: 'away', title: game.awayTeam.name },
-                                    { key: 'home', title: game.homeTeam.name }
-                                ]
+                                routes: routes
                             }}
-                            renderScene={SceneMap({
-                                away: AwayTab,
-                                home: HomeTab,
-                            })}
+                            renderScene={renderScene}
                             onIndexChange={onTabChange}
                             initialLayout={{ width: Dimensions.get('window').width }}
                             renderTabBar={CustomTabBar}
@@ -130,6 +220,9 @@ export const GameAccordion: React.FC<GameAccordionProps> = ({
     );
 };
 
+const GameAccordionMemo = React.memo(GameAccordionComponent);
+export default GameAccordionMemo;
+
 const styles = {
     container: {
         marginVertical: 4,
@@ -138,7 +231,8 @@ const styles = {
         overflow: 'hidden',
     } as ViewStyle,
     accordionTrigger: {
-        padding: 16,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
         backgroundColor: theme.colors.surface,
     } as ViewStyle,
     accordionTriggerExpanded: {
@@ -151,17 +245,17 @@ const styles = {
         gap: 16,
     } as ViewStyle,
     homeTeamSection: {
-        width: 120,
+        width: '40%',
         alignItems: 'flex-end',
     } as ViewStyle,
     awayTeamSection: {
-        width: 120,
+        width: '40%',
         alignItems: 'flex-start',
     } as ViewStyle,
     centerSection: {
+        width: '20%',
         alignItems: 'center',
         gap: 0,
-        marginHorizontal: 12,
     } as ViewStyle,
     titleRow: {
         flexDirection: 'row',
@@ -194,6 +288,20 @@ const styles = {
         color: theme.colors.onSurface,
         textAlign: 'center' as const,
         lineHeight: 16,
+        letterSpacing: -.2,
+    },
+    selectedPlayer: {
+        fontSize: 10,
+        fontWeight: '400' as const,
+        color: theme.colors.primary,
+        textAlign: 'center' as const,
+        letterSpacing: -.2,
+    },
+    noSelection: {
+        fontSize: 10,
+        fontWeight: '400' as const,
+        color: theme.colors.secondary,
+        textAlign: 'center' as const,
         letterSpacing: -.2,
     },
     gameStatus: {

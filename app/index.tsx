@@ -17,9 +17,9 @@ const LoginScreen: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
       await login(response.data.token);
-      router.push('/home');
+      // Navigation will be handled by AuthenticationGuard in _layout.tsx
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed. Check your credentials.');
     }

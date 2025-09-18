@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://localhost:5000';
+export const API_BASE_URL = 'http://localhost:5000/api';
 
 // For Android Emulator, uncomment the line below and comment out the one above
-// export const API_BASE_URL = 'http://10.0.2.2:5000';
+// export const API_BASE_URL = 'http://10.0.2.2:5000/api';

@@ -17,7 +17,7 @@ const RegisterScreen: React.FC = () => {
     try {
       const response = await axios.post(`${API_BASE_URL}/api/auth/register`, { email, password });
       await login(response.data.token); // Assume register returns a token
-      router.push('/home');
+      // Navigation will be handled by AuthenticationGuard in _layout.tsx
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed. Try a different email.');
     }

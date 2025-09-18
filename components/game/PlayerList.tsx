@@ -1,111 +1,59 @@
-import axios from 'axios';
 import { useRouter } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Text } from 'react-native-paper';
-import { API_BASE_URL } from '../../constants/api';
 import { GamePlayer, PlayerListProps } from '../../constants/interfaces';
 import { theme } from '../../constants/theme';
+import { useGameData } from '../../contexts/GameDataContext';
 import { useAuth } from '../../providers/AuthProvider';
 
-export const PlayerList: React.FC<PlayerListProps> = ({
+export const PlayerList: React.FC<PlayerListProps> = React.memo(({
     gameId,
     teamId,
     onSelectionChange,
 }) => {
     const router = useRouter();
     const { isAuthenticated } = useAuth();
-    const [loading, setLoading] = useState(true);
-    const [players, setPlayers] = useState<GamePlayer[]>([]);
-    const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+    const { players, playerLoading, selectedPlayers, fetchPlayers, selectPlayer, playerFetchAttempts, resetPlayerFetchAttempt } = useGameData();
     const [savingSelection, setSavingSelection] = useState(false);
+    const [fetchError, setFetchError] = useState<string | null>(null);
 
-    // Fetch existing selection for this game/team
-    const fetchExistingSelection = async () => {
-        try {
-            // Check if user is still authenticated before making API call
-            if (!isAuthenticated) {
-                setLoading(false);
-                return;
-            }
+    const currentPlayers = players[teamId] || [];
+    const isLoading = playerLoading[`${gameId}-${teamId}`] || false;
+    const selectedPlayer = selectedPlayers[teamId];
 
-            const token = await SecureStore.getItemAsync('jwtToken');
-            if (!token) {
-                setLoading(false);
-                return;
-            }
+    // If we've attempted to fetch and have data (or know there is no data), don't show loading
+    const fetchKey = `${gameId}-${teamId}`;
+    const hasAttemptedFetch = playerFetchAttempts[fetchKey];
+    const shouldShowLoading = isLoading && !hasAttemptedFetch;
 
-            const headers = { Authorization: `Bearer ${token}` };
-            const response = await axios.get(
-                `${API_BASE_URL}/api/selections/${gameId}/${teamId}`,
-                { headers }
-            );
+    console.log(`PlayerList render [${gameId}-${teamId}]:`, {
+        currentPlayersCount: currentPlayers.length,
+        shouldShowLoading,
+        hasAttemptedFetch
+    });
 
-            if (response.data && response.data.gamePlayer) {
-                setSelectedPlayerId(response.data.gamePlayer._id);
-            }
-        } catch (error) {
-            console.error('Error fetching existing selection:', error);
-            // If it's an auth error, don't redirect - let the auth guard handle it
-            if (axios.isAxiosError(error) && error.response?.status === 401) {
-                console.log('Auth error in fetchExistingSelection - user may have logged out');
-            }
-        } finally {
-            setLoading(false);
+    // Fetch players when component mounts
+    useEffect(() => {
+        const fetchKey = `${gameId}-${teamId}`;
+        // Always try to fetch if we haven't attempted it yet, regardless of cached data
+        if (isAuthenticated && !playerFetchAttempts[fetchKey]) {
+            console.log(`PlayerList: Fetching players for ${fetchKey}`);
+            setFetchError(null); // Clear any previous errors
+            
+            fetchPlayers(gameId, teamId).catch((error) => {
+                console.error(`PlayerList: Failed to fetch players for ${fetchKey}:`, error);
+                setFetchError('Failed to load players');
+            });
         }
-    };
+    }, [gameId, teamId, isAuthenticated, fetchPlayers, playerFetchAttempts]);
 
     // Save player selection
     const savePlayerSelection = async (gamePlayerId: string) => {
         try {
-            // Check if user is still authenticated before making API call
-            if (!isAuthenticated) {
-                console.log('User not authenticated, skipping save');
-                return;
-            }
-
             setSavingSelection(true);
-            const token = await SecureStore.getItemAsync('jwtToken');
-            if (!token) {
-                console.error('No auth token found');
-                return;
-            }
 
-            const headers = { Authorization: `Bearer ${token}` };
-
-            // If there's an existing selection, delete it first
-            if (selectedPlayerId) {
-                try {
-                    const existingSelection = await axios.get(
-                        `${API_BASE_URL}/api/selections/${gameId}/${teamId}`,
-                        { headers }
-                    );
-                    if (existingSelection.data) {
-                        await axios.delete(
-                            `${API_BASE_URL}/api/selections/${existingSelection.data._id}`,
-                            { headers }
-                        );
-                    }
-                } catch (error) {
-                    console.error('Error deleting existing selection:', error);
-                    // If it's an auth error, don't continue
-                    if (axios.isAxiosError(error) && error.response?.status === 401) {
-                        console.log('Auth error during delete - user may have logged out');
-                        return;
-                    }
-                }
-            }
-
-            // Create new selection
-            const response = await axios.post(
-                `${API_BASE_URL}/api/selections`,
-                { gamePlayerId },
-                { headers }
-            );
-
-            setSelectedPlayerId(gamePlayerId);
-            console.log('Selection saved:', response.data);
+            await selectPlayer(gamePlayerId);
 
             // Notify parent component of selection change
             if (onSelectionChange) {
@@ -116,11 +64,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({
                 });
             }
         } catch (error) {
-            console.error('Error saving selection:', error);
-            // If it's an auth error, don't redirect - let the auth guard handle it
-            if (axios.isAxiosError(error) && error.response?.status === 401) {
-                console.log('Auth error during save - user may have logged out');
-            }
+            console.error('Error saving player selection:', error);
         } finally {
             setSavingSelection(false);
         }
@@ -133,44 +77,6 @@ export const PlayerList: React.FC<PlayerListProps> = ({
         await savePlayerSelection(gamePlayer._id);
     };
 
-    useEffect(() => {
-        async function fetchPlayers() {
-            try {
-                // Check if user is still authenticated before making API call
-                if (!isAuthenticated) {
-                    setLoading(false);
-                    return;
-                }
-
-                const token = await SecureStore.getItemAsync('jwtToken');
-                if (!token) {
-                    console.error('No auth token found');
-                    setLoading(false);
-                    return;
-                }
-
-                const headers = { Authorization: `Bearer ${token}` };
-                const response = await axios.get(
-                    `${API_BASE_URL}/api/data/game-players?gameId=${gameId}&teamId=${teamId}`,
-                    { headers }
-                );
-                console.log('Fetched players:', response.data);
-                setPlayers(response.data);
-            } catch (error) {
-                console.error('Error fetching players:', error);
-                // If it's an auth error, don't redirect - let the auth guard handle it
-                if (axios.isAxiosError(error) && error.response?.status === 401) {
-                    console.log('Auth error in fetchPlayers - user may have logged out');
-                }
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchPlayers();
-        fetchExistingSelection();
-    }, [gameId, teamId, isAuthenticated]);
-
     const getPlayerName = (gamePlayer: GamePlayer) => {
         return gamePlayer.name || gamePlayer.player?.name || 'Unknown Player';
     };
@@ -180,8 +86,8 @@ export const PlayerList: React.FC<PlayerListProps> = ({
     };
 
     const renderPlayerRow = ({ item }: { item: GamePlayer }) => {
-        const isSelected = selectedPlayerId === item._id;
-        const isSaving = savingSelection && selectedPlayerId === item._id;
+        const isSelected = selectedPlayer?._id === item._id;
+        const isSaving = savingSelection && selectedPlayer?._id === item._id;
 
         return (
             <TouchableOpacity
@@ -220,7 +126,24 @@ export const PlayerList: React.FC<PlayerListProps> = ({
         );
     };
 
-    if (loading) {
+    if (fetchError) {
+        return (
+            <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>{fetchError}</Text>
+                <TouchableOpacity 
+                    style={styles.retryButton}
+                    onPress={() => {
+                        resetPlayerFetchAttempt(gameId, teamId);
+                        setFetchError(null);
+                    }}
+                >
+                    <Text style={styles.retryText}>Retry</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    if (shouldShowLoading) {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -228,8 +151,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({
         );
     }
 
-    if (players.length === 0) {
-        console.log('No players found for team:', teamId);
+    if (currentPlayers.length === 0) {
         return (
             <View style={styles.emptyContainer}>
                 <Text style={styles.emptyText}>Lineup not set</Text>
@@ -239,20 +161,33 @@ export const PlayerList: React.FC<PlayerListProps> = ({
 
     return (
         <FlatList
-            data={[...players].sort((a, b) => a.battingOrder - b.battingOrder)}
+            data={[...currentPlayers].sort((a, b) => a.battingOrder - b.battingOrder)}
             renderItem={renderPlayerRow}
             keyExtractor={(item) => item._id}
             scrollEnabled={false}
             style={styles.container}
         />
     );
-};
+});
 
 const styles = {
     container: theme.components.container as ViewStyle,
     loadingContainer: theme.components.loadingContainer as ViewStyle,
     emptyContainer: theme.components.emptyContainer as ViewStyle,
+    errorContainer: {
+        ...theme.components.emptyContainer,
+        backgroundColor: '#fff3f3',
+        borderColor: '#f5c6cb',
+        borderWidth: 1,
+        borderRadius: 4,
+        padding: 16,
+    } as ViewStyle,
     emptyText: theme.components.emptyText as TextStyle,
+    errorText: {
+        color: '#721c24',
+        fontSize: 14,
+        textAlign: 'center',
+    } as TextStyle,
     playerRow: theme.components.playerRow as ViewStyle,
     playerInfo: theme.components.playerInfo as ViewStyle,
     battingOrder: theme.components.battingOrder as TextStyle,
@@ -287,4 +222,17 @@ const styles = {
         position: 'absolute',
         right: 8,
     } as ViewStyle,
+    retryButton: {
+        marginTop: 8,
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderRadius: 4,
+        backgroundColor: theme.colors.primary,
+        alignItems: 'center',
+    } as ViewStyle,
+    retryText: {
+        color: '#ffffff',
+        fontSize: 16,
+        fontWeight: '500',
+    } as TextStyle,
 };

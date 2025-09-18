@@ -65,7 +65,7 @@ export const theme = {
       flexGrow: 1,
     },
     contentContainer: {
-      padding: 16, // theme.spacing.md
+      padding: 8, // theme.spacing.md
     },
 
     // Loading states

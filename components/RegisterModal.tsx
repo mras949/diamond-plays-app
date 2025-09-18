@@ -158,7 +158,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
 
     try {
       setLoading(true);
-      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, {
+      const response = await axios.post(`${API_BASE_URL}/auth/register`, {
         email: email.trim(),
         password
       });

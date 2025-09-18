@@ -69,7 +69,7 @@ export interface Game {
 
 export interface GamePlayer {
   _id: string;
-  game: string; // Game ID
+  game: string | Game; // Game ID or populated game object
   player: Player; // Populated player object
   team: string | Team; // Team ID or populated team object
   battingOrder: number;
@@ -118,7 +118,6 @@ export interface GameAccordionProps {
   onToggleExpand: () => void;
   tabIndex: number;
   onTabChange: (index: number) => void;
-  onSelectionChange?: (selection: Selection) => void;
 }
 
 export interface GameDetailsProps {
