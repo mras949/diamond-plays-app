@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { Dimensions, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Dimensions, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SceneMap, TabView } from 'react-native-tab-view';
 import { GameAccordionProps } from '../../constants/interfaces';
@@ -224,140 +224,30 @@ const GameAccordionMemo = React.memo(GameAccordionComponent);
 export default GameAccordionMemo;
 
 const styles = {
-    container: {
-        marginVertical: 4,
-        backgroundColor: theme.colors.surface,
-        borderRadius: 8,
-        overflow: 'hidden',
-    } as ViewStyle,
-    accordionTrigger: {
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        backgroundColor: theme.colors.surface,
-    } as ViewStyle,
-    accordionTriggerExpanded: {
-        borderBottomWidth: 0,
-    } as ViewStyle,
-    triggerContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 16,
-    } as ViewStyle,
-    homeTeamSection: {
-        width: '40%',
-        alignItems: 'flex-end',
-    } as ViewStyle,
-    awayTeamSection: {
-        width: '40%',
-        alignItems: 'flex-start',
-    } as ViewStyle,
-    centerSection: {
-        width: '20%',
-        alignItems: 'center',
-        gap: 0,
-    } as ViewStyle,
-    titleRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-    } as ViewStyle,
-    vsText: {
-        fontSize: 14,
-        fontWeight: '400' as const,
-        color: theme.colors.onSurfaceVariant,
-        opacity: 0.8,
-    },
-    statusRow: {
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 1,
-    } as ViewStyle,
-    teamCity: {
-        fontSize: 10,
-        fontWeight: '300' as const,
-        color: theme.colors.onSurface,
-        textAlign: 'center' as const,
-        lineHeight: 14,
-        letterSpacing: -.5,
-    },
-    teamName: {
-        fontSize: 14,
-        fontWeight: '800' as const,
-        color: theme.colors.onSurface,
-        textAlign: 'center' as const,
-        lineHeight: 16,
-        letterSpacing: -.2,
-    },
-    selectedPlayer: {
-        fontSize: 10,
-        fontWeight: '400' as const,
-        color: theme.colors.primary,
-        textAlign: 'center' as const,
-        letterSpacing: -.2,
-    },
-    noSelection: {
-        fontSize: 10,
-        fontWeight: '400' as const,
-        color: theme.colors.secondary,
-        textAlign: 'center' as const,
-        letterSpacing: -.2,
-    },
-    gameStatus: {
-        fontSize: 8,
-        fontWeight: '500' as const,
-        color: theme.colors.text,
-        textTransform: 'capitalize' as const,
-        textAlign: 'center' as const,
-        padding: 0,
-        margin: 0,
-        lineHeight: 12,
-        letterSpacing: -.5,
-    },
-    gameDateTime: {
-        fontSize: 10,
-        fontWeight: '800' as const,
-        color: theme.colors.onSurfaceVariant,
-        textAlign: 'center' as const,
-        padding: 0,
-        margin: 0,
-        lineHeight: 12,
-        letterSpacing: -.5,
-    },
+    container: theme.components.gameAccordionContainer as ViewStyle,
+    accordionTrigger: theme.components.gameAccordionTrigger as ViewStyle,
+    accordionTriggerExpanded: theme.components.gameAccordionTriggerExpanded as ViewStyle,
+    triggerContent: theme.components.gameAccordionTriggerContent as ViewStyle,
+    homeTeamSection: theme.components.gameAccordionHomeTeamSection as ViewStyle,
+    awayTeamSection: theme.components.gameAccordionAwayTeamSection as ViewStyle,
+    centerSection: theme.components.gameAccordionCenterSection as ViewStyle,
+    titleRow: theme.components.gameAccordionTitleRow as ViewStyle,
+    vsText: theme.components.gameAccordionVsText as TextStyle,
+    statusRow: theme.components.gameAccordionStatusRow as ViewStyle,
+    teamCity: theme.components.gameAccordionTeamCity as TextStyle,
+    teamName: theme.components.gameAccordionTeamName as TextStyle,
+    selectedPlayer: theme.components.gameAccordionSelectedPlayer as TextStyle,
+    noSelection: theme.components.gameAccordionNoSelection as TextStyle,
+    gameStatus: theme.components.gameAccordionGameStatus as TextStyle,
+    gameDateTime: theme.components.gameAccordionGameDateTime as TextStyle,
     expandedContent: theme.components.expandedContent as ViewStyle,
     tabViewContainer: theme.components.tabViewContainer as ViewStyle,
     tabBar: theme.components.tabBar as ViewStyle,
     tabIndicator: theme.components.tabIndicator as ViewStyle,
     tabView: theme.components.tabView as ViewStyle,
     tabContent: theme.components.tabContent as ViewStyle,
-    customTabBar: {
-        flexDirection: 'row',
-        height: 48,
-        backgroundColor: '#ffffff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#e5e5e5',
-    } as ViewStyle,
-    tabLabel: {
-        fontSize: 12,
-        fontWeight: '500' as const,
-        textTransform: 'capitalize' as const,
-        color: '#71717a', // Default color for inactive tabs
-    },
-    tabItem: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        position: 'relative',
-        minHeight: 36,
-    } as ViewStyle,
-    tabIndicatorActive: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 2,
-        backgroundColor: theme.colors.primary,
-    } as ViewStyle,
+    customTabBar: theme.components.gameAccordionCustomTabBar as ViewStyle,
+    tabLabel: theme.components.gameAccordionTabLabel as TextStyle,
+    tabItem: theme.components.gameAccordionTabItem as ViewStyle,
+    tabIndicatorActive: theme.components.gameAccordionTabIndicatorActive as ViewStyle,
 };

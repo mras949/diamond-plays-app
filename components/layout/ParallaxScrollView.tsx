@@ -1,14 +1,15 @@
 import type { PropsWithChildren, ReactElement } from 'react';
-import { StyleSheet } from 'react-native';
+import { ScrollView } from 'react-native';
 import Animated, {
-    interpolate,
-    useAnimatedRef,
-    useAnimatedStyle,
-    useScrollViewOffset,
+  interpolate,
+  useAnimatedRef,
+  useAnimatedStyle,
+  useScrollViewOffset,
 } from 'react-native-reanimated';
 
 import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
 import { ThemedView } from '@/components/ui/ThemedView';
+import { theme as appTheme } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 const HEADER_HEIGHT = 250;
@@ -45,38 +46,19 @@ export default function ParallaxScrollView({
   });
 
   return (
-    <ThemedView style={styles.container}>
-      <Animated.ScrollView
+    <ThemedView style={appTheme.components.parallaxContainer}>
+      <Animated.View style={[appTheme.components.parallaxHeader, headerAnimatedStyle]}>
+        {headerImage}
+      </Animated.View>
+      <ScrollView
         ref={scrollRef}
         scrollEventThrottle={16}
-        scrollIndicatorInsets={{ bottom }}
-        contentContainerStyle={{ paddingBottom: bottom }}>
-        <Animated.View
-          style={[
-            styles.header,
-            { backgroundColor: headerBackgroundColor[colorScheme] },
-            headerAnimatedStyle,
-          ]}>
-          {headerImage}
-        </Animated.View>
-        <ThemedView style={styles.content}>{children}</ThemedView>
-      </Animated.ScrollView>
+        scrollIndicatorInsets={{ top: HEADER_HEIGHT - 10 }}
+        contentContainerStyle={appTheme.components.parallaxContent}
+        bounces={false}
+      >
+        {children}
+      </ScrollView>
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    height: HEADER_HEIGHT,
-    overflow: 'hidden',
-  },
-  content: {
-    flex: 1,
-    padding: 32,
-    gap: 16,
-    overflow: 'hidden',
-  },
-});

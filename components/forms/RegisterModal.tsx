@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { BlurView } from 'expo-blur';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, KeyboardAvoidingView, Modal, PanResponder, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Animated, KeyboardAvoidingView, Modal, PanResponder, Platform, TouchableOpacity, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { API_BASE_URL } from '../../constants/api';
+import { theme } from '../../constants/theme';
 import { useAuth } from '../../providers/AuthProvider';
 
 interface RegisterModalProps {
@@ -184,64 +185,33 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
     onClose();
   };
 
+  // Animated styles
+  const animatedStyle = {
+    opacity: backdropOpacity,
+    transform: [
+      {
+        translateY: Animated.add(modalTranslateY, panY),
+      },
+    ],
+  };
+
   return (
     <Modal
       visible={visible}
-      animationType="none"
-      onRequestClose={handleClose}
+      animationType="slide"
       transparent={true}
+      onRequestClose={onClose}
     >
-      <View style={styles.container}>
-        {/* Backdrop Touchable - placed before blur for proper touch handling */}
-        <TouchableOpacity
-          style={styles.backdropTouchable}
-          activeOpacity={1}
-          onPress={() => {
-            console.log('Backdrop pressed');
-            handleClose();
-          }}
-        />
-
-        {/* Animated Blurred Backdrop */}
-        <Animated.View style={[styles.blurBackdrop, { opacity: backdropOpacity }]}>
-          <BlurView
-            style={StyleSheet.absoluteFill}
-            intensity={20}
-            tint="dark"
-          />
-        </Animated.View>
-
-        {/* Animated Modal Content */}
-        <Animated.View
-          style={[
-            styles.modalWrapper,
-            {
-              transform: [
-                {
-                  translateY: Animated.add(modalTranslateY, panY),
-                },
-              ],
-            },
-          ]}
-          {...panResponder.panHandlers}
-        >
-          <KeyboardAvoidingView
-            style={styles.keyboardAvoidingView}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          >
-            <View style={styles.modalContent}>
-              <View style={styles.handleContainer}>
-                <Animated.View
-                  style={[
-                    styles.handle,
-                    {
-                      transform: [{ scaleY: handleScale }],
-                    },
-                  ]}
-                />
+      <View style={theme.components.modalContainer}>
+        <BlurView style={theme.components.modalBackdrop} intensity={20} />
+        <TouchableOpacity style={theme.components.modalBackdrop} onPress={onClose} />
+        <View style={theme.components.modalWrapper}>
+          <KeyboardAvoidingView style={theme.components.modalWrapper} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <Animated.View style={[theme.components.modalContent, animatedStyle]} {...panResponder.panHandlers}>
+              <View style={theme.components.modalHandleContainer}>
+                <View style={theme.components.modalHandle} />
               </View>
-
-              <Text style={styles.title}>Create Account</Text>
+              <Text style={theme.components.modalTitle}>Create Account</Text>
 
               <TextInput
                 label="Email"
@@ -249,7 +219,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 onChangeText={setEmail}
                 autoCapitalize="none"
                 keyboardType="email-address"
-                style={styles.input}
+                style={theme.components.modalInput}
               />
 
               <TextInput
@@ -257,7 +227,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
-                style={styles.input}
+                style={theme.components.modalInput}
               />
 
               <TextInput
@@ -265,17 +235,17 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry
-                style={styles.input}
+                style={theme.components.modalInput}
               />
 
               {password && confirmPassword && password === confirmPassword ? (
-                <Text style={styles.successText}>✓ Passwords match</Text>
+                <Text style={theme.components.modalSuccessText}>✓ Passwords match</Text>
               ) : null}
 
               {error ? (
                 <Text style={[
-                  styles.error,
-                  password && confirmPassword && password !== confirmPassword ? styles.validationError : styles.serverError
+                  theme.components.modalError,
+                  password && confirmPassword && password !== confirmPassword ? theme.components.modalValidationError : theme.components.modalServerError
                 ]}>
                   {error}
                 </Text>
@@ -284,120 +254,22 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               <Button
                 mode="contained"
                 onPress={handleRegister}
-                style={styles.button}
+                style={theme.components.modalButton}
                 loading={loading}
                 disabled={loading}
               >
                 {loading ? 'Creating Account...' : 'Sign Up'}
               </Button>
 
-              <TouchableOpacity onPress={onSwitchToLogin} style={styles.switchContainer}>
-                <Text style={styles.switchText}>
-                  Already have an account? <Text style={styles.switchLink}>Log in</Text>
+              <TouchableOpacity onPress={onSwitchToLogin} style={theme.components.modalSwitchContainer}>
+                <Text style={theme.components.modalSwitchText}>
+                  Already have an account? <Text style={theme.components.modalSwitchLink}>Log in</Text>
                 </Text>
               </TouchableOpacity>
-            </View>
+            </Animated.View>
           </KeyboardAvoidingView>
-        </Animated.View>
+        </View>
       </View>
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  blurBackdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  backdropTouchable: {
-    flex: 1,
-  },
-  modalWrapper: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: '#ffffff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 24,
-    paddingBottom: Platform.OS === 'ios' ? 40 : 24,
-    maxHeight: '100%',
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  handleContainer: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 2,
-    alignSelf: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '200',
-    color: '#000000',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  input: {
-    fontSize: 14,
-    marginBottom: 10,
-    backgroundColor: '#ffffff',
-  },
-  error: {
-    color: '#ff0000',
-    textAlign: 'center',
-    marginBottom: 15,
-    fontSize: 14,
-  },
-  successText: {
-    color: '#4caf50', // Green for success
-    textAlign: 'center',
-    fontSize: 14,
-    marginBottom: 10,
-    fontWeight: '500',
-  },
-  validationError: {
-    color: '#ff6b35', // Orange for validation errors
-  },
-  serverError: {
-    color: '#ff0000', // Red for server errors
-  },
-  button: {
-    marginVertical: 10,
-    backgroundColor: '#0066cc',
-  },
-  switchContainer: {
-    alignItems: 'center',
-    marginTop: 15,
-  },
-  switchText: {
-    color: '#666666',
-    fontSize: 14,
-  },
-  switchLink: {
-    color: '#0066cc',
-    fontWeight: '600',
-  },
-});

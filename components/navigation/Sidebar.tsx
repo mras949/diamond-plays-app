@@ -1,5 +1,6 @@
 import React from 'react';
-import { Animated, Dimensions, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Animated, Dimensions, TouchableOpacity, View } from 'react-native';
+import { Text } from 'react-native-paper';
 import { theme } from '../../constants/theme';
 
 const { width } = Dimensions.get('window');
@@ -45,24 +46,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <>
       {/* Backdrop */}
       <TouchableOpacity
-        style={styles.backdrop}
+        style={theme.components.sidebarBackdrop}
         activeOpacity={1}
         onPress={onClose}
       />
 
       {/* Sidebar */}
-      <Animated.View style={[styles.sidebar, { transform: [{ translateX: slideAnim }] }]}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Menu</Text>
+      <Animated.View style={[theme.components.sidebar, { transform: [{ translateX: slideAnim }] }]}>
+        <View style={theme.components.sidebarHeader}>
+          <Text style={theme.components.sidebarTitle}>Menu</Text>
         </View>
 
-        <View style={styles.menuItems}>
+        <View style={theme.components.sidebarMenuItems}>
           <TouchableOpacity
-            style={styles.menuItem}
+            style={theme.components.sidebarMenuItem}
             onPress={onLogout}
             disabled={logoutLoading}
           >
-            <Text style={[styles.menuText, logoutLoading && styles.disabledText]}>
+            <Text style={[theme.components.sidebarMenuText, logoutLoading && theme.components.sidebarMenuTextDisabled]}>
               {logoutLoading ? 'Logging out...' : 'Logout'}
             </Text>
           </TouchableOpacity>
@@ -71,52 +72,3 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  backdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 2000,
-  } as ViewStyle,
-  sidebar: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    bottom: 0,
-    width: width * 0.75, // 75% of screen width
-    backgroundColor: theme.colors.surface,
-    zIndex: 2001,
-    paddingTop: 50, // Account for status bar
-  } as ViewStyle,
-  header: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.outline,
-  } as ViewStyle,
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: theme.colors.onSurface,
-  } as TextStyle,
-  menuItems: {
-    flex: 1,
-    padding: 10,
-  } as ViewStyle,
-  menuItem: {
-    padding: 15,
-    borderRadius: 8,
-    backgroundColor: theme.colors.surfaceVariant,
-    marginBottom: 10,
-  } as ViewStyle,
-  menuText: {
-    fontSize: 16,
-    color: theme.colors.onSurface,
-  } as TextStyle,
-  disabledText: {
-    color: theme.colors.onSurfaceDisabled,
-  } as TextStyle,
-});
