@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, ScrollView, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Text } from 'react-native-paper';
-import { theme } from '../constants/theme';
-import { useGameData } from '../contexts/GameDataContext';
+import { theme } from '../../constants/theme';
+import { useGameData } from '../../contexts/GameDataContext';
 
 const DateSelector: React.FC = () => {
   const { selectedDate, setSelectedDate } = useGameData();

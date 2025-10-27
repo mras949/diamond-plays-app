@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { API_BASE_URL } from '../constants/api';
 import { Game, GamePlayer } from '../constants/interfaces';
 import { useAuth } from '../providers/AuthProvider';
@@ -60,38 +60,44 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
   const [playerLoading, setPlayerLoading] = useState<Record<string, boolean>>({});
   const [playerFetchAttempts, setPlayerFetchAttempts] = useState<Record<string, boolean>>({});
 
-  // Refs for fetch protection
-  const isFetchingRef = useRef<number | null>(null);
-  const mountedRef = useRef(true);
-  const gamesRef = useRef<Game[]>([]);
-
-  // Track player fetch attempts globally to prevent infinite loops
-  const playerFetchAttemptsRef = useRef<Record<string, boolean>>({});
+  // Consolidated refs for proper cleanup and memory management
+  const refs = useRef({
+    isFetching: null as number | null,
+    mounted: true,
+    games: [] as Game[],
+    playerFetchAttempts: {} as Record<string, boolean>,
+    abortController: null as AbortController | null,
+    playerAbortController: null as AbortController | null,
+    selectionAbortController: null as AbortController | null,
+    selectionsAbortController: null as AbortController | null,
+  });
 
   // Fetch games function
   const fetchGames = useCallback(async (showLoading = false) => {
-    console.log(`GameData: fetchGames called with showLoading=${showLoading}, selectedDate=${selectedDate.toDateString()}`);
 
     // Intelligent fetch protection
     const now = Date.now();
-    if (isFetchingRef.current && (now - isFetchingRef.current) < 5000) {
-      console.log('GameData: Fetch already in progress, skipping');
+    if (refs.current.isFetching && (now - refs.current.isFetching) < 5000) {
       return;
     }
 
-    isFetchingRef.current = now;
-    console.log('GameData: Starting fetch, set isFetchingRef to', now);
+    // Cancel any existing request
+    if (refs.current.abortController) {
+      refs.current.abortController.abort();
+    }
+
+    // Create new abort controller for this request
+    refs.current.abortController = new AbortController();
+    refs.current.isFetching = now;
 
     try {
       if (showLoading) {
-        console.log('GameData: Setting loading to true');
         setLoading(true);
         setError(null);
       }
 
       const token = await SecureStore.getItemAsync('jwtToken');
       if (!token) {
-        console.log('GameData: No auth token');
         if (showLoading) {
           setLoading(false);
         }
@@ -102,23 +108,21 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
         String(selectedDate.getMonth() + 1).padStart(2, '0') + '-' +
         String(selectedDate.getDate()).padStart(2, '0');
 
-      console.log(`GameData: Making API request for date ${localDateStr}`);
       const response = await axios.get(`${API_BASE_URL}/data/games?date=${localDateStr}`, {
         headers: { Authorization: `Bearer ${token}` },
+        signal: refs.current.abortController.signal,
       });
 
-      console.log(`GameData: Received response with ${response.data?.length || 0} games`);
 
       setGames(response.data || []);
       setError(null);
 
     } catch (err) {
-      console.error('GameData: Error in fetchGames:', err);
       setError('Failed to load games');
       setGames([]);
     } finally {
-      console.log('GameData: Fetch completed, resetting isFetchingRef and loading');
-      isFetchingRef.current = null;
+      refs.current.isFetching = null;
+      refs.current.abortController = null;
       if (showLoading) {
         setLoading(false);
       }
@@ -143,28 +147,32 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
   // Fetch players for a specific game and team
   const fetchPlayers = useCallback(async (gameId: string, teamId: string) => {
     const key = `${gameId}-${teamId}`;
-    if (playerLoading[key] || playerFetchAttemptsRef.current[key]) {
-      console.log(`GameData: Already attempted to fetch players for ${key}, skipping`);
+    if (playerLoading[key] || refs.current.playerFetchAttempts[key]) {
       return; // Already loading or already attempted
     }
 
-    console.log(`GameData: Starting to fetch players for ${key}`);
-    playerFetchAttemptsRef.current[key] = true;
+    // Cancel any existing player request
+    if (refs.current.playerAbortController) {
+      refs.current.playerAbortController.abort();
+    }
+
+    // Create new abort controller for this player request
+    refs.current.playerAbortController = new AbortController();
+    refs.current.playerFetchAttempts[key] = true;
     setPlayerLoading(prev => ({ ...prev, [key]: true }));
 
     try {
       const token = await SecureStore.getItemAsync('jwtToken');
       if (!token) {
-        console.log('GameData: No auth token, skipping player fetch');
         return;
       }
 
       const response = await axios.get(`${API_BASE_URL}/data/game-players?gameId=${gameId}&teamId=${teamId}`, {
         headers: { Authorization: `Bearer ${token}` },
         timeout: 10000, // 10 second timeout
+        signal: refs.current.playerAbortController.signal,
       });
 
-      console.log(`GameData: Received response for ${key}: ${Array.isArray(response.data) ? response.data.length : 'invalid'} players`);
 
       // Reset loading state immediately
       setPlayerLoading(prev => ({ ...prev, [key]: false }));
@@ -176,14 +184,22 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
         return { ...prev, [teamId]: newPlayers };
       });
     } catch (err) {
-      console.error('GameData: Error fetching players:', err);
       // Ensure loading state is reset even on error
       setPlayerLoading(prev => ({ ...prev, [key]: false }));
+      refs.current.playerAbortController = null;
     }
   }, []);
 
   // Handle player selection (save to server)
   const selectPlayer = useCallback(async (gamePlayerId: string) => {
+    // Cancel any existing selection request
+    if (refs.current.selectionAbortController) {
+      refs.current.selectionAbortController.abort();
+    }
+
+    // Create new abort controller for this selection request
+    refs.current.selectionAbortController = new AbortController();
+
     try {
       const token = await SecureStore.getItemAsync('jwtToken');
       if (!token) return;
@@ -205,29 +221,28 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
         throw new Error(`Invalid gameId (${gameId}) or teamId (${teamId}) for player ${gamePlayerId}`);
       }
 
-      console.log('Selecting player:', { gamePlayerId, gameId, teamId });
 
       const headers = { Authorization: `Bearer ${token}` };
 
       // Try to create the selection
       try {
-        console.log('Creating new selection for gamePlayerId:', gamePlayerId);
         await axios.post(`${API_BASE_URL}/selections`, {
           gamePlayerId
         }, {
           headers,
+          signal: refs.current.selectionAbortController.signal,
         });
       } catch (error: any) {
         // If the error is "You already have a selection for this team in this game",
         // find and delete the existing selection, then retry
         if (error.response?.data?.message === 'You already have a selection for this team in this game') {
-          console.log('Existing selection found, attempting to delete and retry');
 
           try {
             // Find the existing selection by fetching all selections and filtering
-            console.log('Fetching all user selections to find existing one for game:', gameId, 'team:', teamId);
-            const allSelections = await axios.get(`${API_BASE_URL}/selections`, { headers });
-            console.log('All selections count:', allSelections.data.length);
+            const allSelections = await axios.get(`${API_BASE_URL}/selections`, { 
+              headers,
+              signal: refs.current.selectionAbortController.signal,
+            });
             
             // Find the selection for this game and team
             const existingSelection = allSelections.data.find((selection: any) => {
@@ -236,28 +251,26 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
               return selectionGameId === gameId && selectionTeamId === teamId;
             });
             
-            console.log('Found existing selection:', existingSelection ? existingSelection._id : 'none');
 
             if (existingSelection && existingSelection._id) {
-              console.log('Found existing selection to delete:', existingSelection._id);
               // Delete the existing selection
-              await axios.delete(`${API_BASE_URL}/selections/${existingSelection._id}`, { headers });
+              await axios.delete(`${API_BASE_URL}/selections/${existingSelection._id}`, { 
+                headers,
+                signal: refs.current.selectionAbortController.signal,
+              });
 
               // Retry creating the new selection
-              console.log('Retrying creation of new selection');
               await axios.post(`${API_BASE_URL}/selections`, {
                 gamePlayerId
               }, {
                 headers,
+                signal: refs.current.selectionAbortController.signal,
               });
             } else {
-              console.error('No existing selection found in user selections');
               throw new Error('Could not find existing selection to delete');
             }
           } catch (deleteError: any) {
-            console.error('Error in delete/retry process:', deleteError);
             if (deleteError.response) {
-              console.error('Delete error response:', deleteError.response.data);
             }
             throw error; // Re-throw the original error
           }
@@ -273,7 +286,7 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
         [teamId]: selectedPlayer
       }));
     } catch (err) {
-      console.error('GameData: Error saving player selection:', err);
+      refs.current.selectionAbortController = null;
       throw err; // Re-throw so components can handle errors
     }
   }, [players]);
@@ -281,6 +294,14 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
   // Fetch selections for all teams in loaded games
   const fetchSelections = useCallback(async () => {
     if (!isAuthenticated || games.length === 0) return;
+
+    // Cancel any existing selections request
+    if (refs.current.selectionsAbortController) {
+      refs.current.selectionsAbortController.abort();
+    }
+
+    // Create new abort controller for this selections request
+    refs.current.selectionsAbortController = new AbortController();
 
     try {
       const token = await SecureStore.getItemAsync('jwtToken');
@@ -290,9 +311,15 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
 
       // Fetch selections for all teams in all games
       const selectionPromises = games.flatMap(game => [
-        axios.get(`${API_BASE_URL}/selections/${game._id}/${game.awayTeam._id}`, { headers })
+        axios.get(`${API_BASE_URL}/selections/${game._id}/${game.awayTeam._id}`, { 
+          headers,
+          signal: refs.current.selectionsAbortController?.signal,
+        })
           .catch(() => null),
-        axios.get(`${API_BASE_URL}/selections/${game._id}/${game.homeTeam._id}`, { headers })
+        axios.get(`${API_BASE_URL}/selections/${game._id}/${game.homeTeam._id}`, { 
+          headers,
+          signal: refs.current.selectionsAbortController?.signal,
+        })
           .catch(() => null),
       ]);
 
@@ -315,24 +342,23 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
 
       setSelectedPlayers(newSelections);
     } catch (error) {
-      console.error('GameData: Error fetching selections:', error);
+      refs.current.selectionsAbortController = null;
     }
   }, [games, isAuthenticated]);
 
   // Initial fetch and date change effect
   useEffect(() => {
-    console.log('GameData: Date changed, fetching games');
     fetchGames(true);
   }, [selectedDate, fetchGames]);
 
   // Fetch selections when games change
   useEffect(() => {
     // Only fetch if games actually changed (not just reference)
-    const gamesChanged = games.length !== gamesRef.current.length || 
-      !games.every((game, index) => game._id === gamesRef.current[index]?._id);
+    const gamesChanged = games.length !== refs.current.games.length || 
+      !games.every((game, index) => game._id === refs.current.games[index]?._id);
     
     if (gamesChanged && games.length > 0) {
-      gamesRef.current = [...games];
+      refs.current.games = [...games];
       fetchSelections();
     }
   }, [games, fetchSelections]);
@@ -344,9 +370,8 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
     const startPeriodicRefresh = () => {
       // Refresh every 2 minutes (120000 ms)
       intervalId = setInterval(async () => {
-        if (mountedRef.current && isAuthenticated && games.length > 0) {
-          console.log('GameData: Periodic refresh triggered');
-          await fetchGames(false); // Don't reset loading state for periodic refreshes
+        if (refs.current.mounted && isAuthenticated && games.length > 0) {
+          await fetchGames(false); // Don't reset loading state for periodic refreshs
           await fetchSelections(); // Also refresh selections
         }
       }, 120000); // 2 minutes
@@ -366,20 +391,19 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
 
     return () => {
       stopPeriodicRefresh();
-      // Don't set mountedRef to false here - it should only be false when context unmounts
+      // Don't set refs.current.mounted to false here - it should only be false when context unmounts
     };
   }, [isAuthenticated, games.length, fetchGames]);
 
   // Context cleanup
   useEffect(() => {
     return () => {
-      mountedRef.current = false;
+      refs.current.mounted = false;
     };
   }, []);
 
   // Manual refresh function
   const refreshAllData = useCallback(async () => {
-    console.log('GameData: Manual refresh triggered');
     await fetchGames(false);
     if (games.length > 0) {
       await fetchSelections();
@@ -389,10 +413,10 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
   // Reset player fetch attempt (for retry functionality)
   const resetPlayerFetchAttempt = useCallback((gameId: string, teamId: string) => {
     const key = `${gameId}-${teamId}`;
-    playerFetchAttemptsRef.current[key] = false;
+    refs.current.playerFetchAttempts[key] = false;
   }, []);
 
-  const value: GameDataContextType = {
+  const value: GameDataContextType = useMemo(() => ({
     selectedDate,
     games,
     loading,
@@ -400,14 +424,28 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
     selectedPlayers,
     players,
     playerLoading,
-    playerFetchAttempts: playerFetchAttemptsRef.current,
+    playerFetchAttempts: refs.current.playerFetchAttempts,
     setSelectedDate,
     refreshGames,
     refreshAllData,
     selectPlayer,
     fetchPlayers,
     resetPlayerFetchAttempt,
-  };
+  }), [
+    selectedDate,
+    games,
+    loading,
+    error,
+    selectedPlayers,
+    players,
+    playerLoading,
+    setSelectedDate,
+    refreshGames,
+    refreshAllData,
+    selectPlayer,
+    fetchPlayers,
+    resetPlayerFetchAttempt,
+  ]);
 
   return (
     <GameDataContext.Provider value={value}>

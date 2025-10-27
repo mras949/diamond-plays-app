@@ -27,22 +27,14 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
     const hasAttemptedFetch = playerFetchAttempts[fetchKey];
     const shouldShowLoading = isLoading && !hasAttemptedFetch;
 
-    console.log(`PlayerList render [${gameId}-${teamId}]:`, {
-        currentPlayersCount: currentPlayers.length,
-        shouldShowLoading,
-        hasAttemptedFetch
-    });
-
     // Fetch players when component mounts
     useEffect(() => {
         const fetchKey = `${gameId}-${teamId}`;
         // Always try to fetch if we haven't attempted it yet, regardless of cached data
         if (isAuthenticated && !playerFetchAttempts[fetchKey]) {
-            console.log(`PlayerList: Fetching players for ${fetchKey}`);
             setFetchError(null); // Clear any previous errors
             
             fetchPlayers(gameId, teamId).catch((error) => {
-                console.error(`PlayerList: Failed to fetch players for ${fetchKey}:`, error);
                 setFetchError('Failed to load players');
             });
         }
@@ -64,7 +56,6 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
                 });
             }
         } catch (error) {
-            console.error('Error saving player selection:', error);
         } finally {
             setSavingSelection(false);
         }
@@ -169,6 +160,8 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
         />
     );
 });
+
+PlayerList.displayName = 'PlayerList';
 
 const styles = {
     container: theme.components.container as ViewStyle,

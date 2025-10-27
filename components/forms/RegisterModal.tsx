@@ -3,8 +3,8 @@ import { BlurView } from 'expo-blur';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, KeyboardAvoidingView, Modal, PanResponder, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
-import { API_BASE_URL } from '../constants/api';
-import { useAuth } from '../providers/AuthProvider';
+import { API_BASE_URL } from '../../constants/api';
+import { useAuth } from '../../providers/AuthProvider';
 
 interface RegisterModalProps {
   visible: boolean;

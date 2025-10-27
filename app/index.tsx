@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
-import { RegisterModal } from '../components/RegisterModal';
+import { RegisterModal } from '../components/forms/RegisterModal';
 import { API_BASE_URL } from '../constants/api';
 import { useAuth } from '../providers/AuthProvider';
 

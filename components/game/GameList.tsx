@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { RefreshControl, ScrollView, TextStyle, View, ViewStyle } from 'react-native';
 import { Text } from 'react-native-paper';
-import { theme } from '../constants/theme';
-import { useGameData } from '../contexts/GameDataContext';
-import GameAccordion from './game/GameAccordion';
+import { theme } from '../../constants/theme';
+import { useGameData } from '../../contexts/GameDataContext';
+import GameAccordion from './GameAccordion';
 
 const GameList: React.FC = () => {
   const { games, refreshGames, refreshAllData, selectPlayer } = useGameData();
