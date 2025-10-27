@@ -47,15 +47,14 @@ const DateSelector: React.FC = () => {
     return checkDate.getTime() <= today.getTime();
   }, []);
 
-  // Scroll today's date into view when component mounts
+  // Scroll selected date into view when component mounts or selectedDate changes
   useEffect(() => {
-    const today = new Date();
-    const todayIndex = dateList.findIndex(date => {
-      const match = date.toDateString() === today.toDateString();
+    const selectedDateIndex = dateList.findIndex(date => {
+      const match = date.toDateString() === selectedDate.toDateString();
       return match;
     });
 
-    if (todayIndex !== -1 && dateScrollRef.current) {
+    if (selectedDateIndex !== -1 && dateScrollRef.current) {
       // More accurate calculation accounting for ScrollView padding
       const itemWidth = 70; // Actual width of date item
       const itemMargin = 4; // Margin on each side (marginHorizontal: 4 = 8px total)
@@ -65,10 +64,10 @@ const DateSelector: React.FC = () => {
       // Calculate position to center the item in the viewport
       const screenWidth = Dimensions.get('window').width;
       const centerOffset = screenWidth / 2;
-      const itemCenterOffset = itemWidth / 2;
+      const itemCenterOffset = itemWidth - (scrollViewPadding*2);
 
       // Account for ScrollView padding in the calculation
-      const scrollPosition = (todayIndex * totalItemWidth) + scrollViewPadding - centerOffset + itemCenterOffset;
+      const scrollPosition = (selectedDateIndex * totalItemWidth) + scrollViewPadding - centerOffset + itemCenterOffset;
 
       // Use multiple attempts with increasing delays to ensure proper scrolling
       const scrollToPosition = () => {
@@ -79,10 +78,8 @@ const DateSelector: React.FC = () => {
       };
 
       setTimeout(scrollToPosition, 100);
-      setTimeout(scrollToPosition, 300);
-      setTimeout(scrollToPosition, 600);
     }
-  }, [dateList]);
+  }, [dateList, selectedDate]);
 
   return (
     <View style={styles.dateSelectorContainer}>
