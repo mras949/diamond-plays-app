@@ -551,5 +551,149 @@ export const theme = {
       fontSize: 16,
       fontWeight: '500',
     } as TextStyle,
+
+    // App-level screen styles
+    // Home screen styles
+    homeErrorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 32,
+      backgroundColor: '#ffffff', // theme.colors.background
+    } as ViewStyle,
+    homeErrorTitle: {
+      color: '#ef4444', // theme.colors.error
+      fontSize: 24,
+      fontWeight: 'bold',
+      marginBottom: 16,
+      textAlign: 'center',
+    } as TextStyle,
+    homeErrorMessage: {
+      color: '#1c1b1f', // theme.colors.onSurface
+      fontSize: 16,
+      textAlign: 'center',
+      marginBottom: 24,
+    } as TextStyle,
+    homeErrorHint: {
+      color: '#49454f', // theme.colors.onSurfaceVariant
+      fontSize: 14,
+      textAlign: 'center',
+      paddingHorizontal: 16,
+    } as TextStyle,
+    homeLoadingOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1000,
+    } as ViewStyle,
+    homeErrorOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(255, 0, 0, 0.1)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+      zIndex: 1000,
+    } as ViewStyle,
+    homeErrorText: {
+      color: '#ef4444', // theme.colors.error
+      fontSize: 16,
+      textAlign: 'center',
+    } as TextStyle,
+
+    // Login screen styles
+    loginContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      padding: 20,
+      backgroundColor: '#ffffff',
+    } as ViewStyle,
+    loginTitle: {
+      fontSize: 24,
+      fontWeight: '200',
+      color: '#000000',
+      textAlign: 'center',
+      marginBottom: 20,
+    } as TextStyle,
+    loginInput: {
+      fontSize: 14,
+      marginBottom: 15,
+      backgroundColor: '#ffffff',
+    } as TextStyle,
+    loginError: {
+      color: '#ef4444', // theme.colors.error
+      textAlign: 'center',
+      marginBottom: 15,
+    } as TextStyle,
+    loginButton: {
+      marginVertical: 10,
+      backgroundColor: '#3b82f6', // theme.colors.primary
+    } as ViewStyle,
+    loginLink: {
+      color: '#3b82f6', // theme.colors.primary
+      textAlign: 'center',
+      marginTop: 15,
+    } as TextStyle,
+
+    // Register screen styles
+    registerContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      padding: 20,
+      backgroundColor: '#ffffff',
+    } as ViewStyle,
+    registerTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: '#000000',
+      textAlign: 'center',
+      marginBottom: 20,
+    } as TextStyle,
+    registerInput: {
+      marginBottom: 15,
+      backgroundColor: '#f9f9f9',
+    } as TextStyle,
+    registerError: {
+      color: '#ef4444', // theme.colors.error
+      textAlign: 'center',
+      marginBottom: 15,
+    } as TextStyle,
+    registerButton: {
+      marginVertical: 10,
+      backgroundColor: '#3b82f6', // theme.colors.primary
+    } as ViewStyle,
+    registerLink: {
+      color: '#3b82f6', // theme.colors.primary
+      textAlign: 'center',
+      marginTop: 15,
+    } as TextStyle,
+
+    // Not found screen styles
+    notFoundContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+    } as ViewStyle,
+    notFoundLink: {
+      marginTop: 15,
+      paddingVertical: 15,
+    } as TextStyle,
+
+    // Layout loading styles
+    layoutLoadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#f4f4f5',
+    } as ViewStyle,
   },
 };

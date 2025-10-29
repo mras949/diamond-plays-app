@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { RegisterModal } from '../components/forms/RegisterModal';
 import { API_BASE_URL } from '../constants/api';
+import { theme } from '../constants/theme';
 import { useAuth } from '../providers/AuthProvider';
 
 const LoginScreen: React.FC = () => {
@@ -61,38 +62,12 @@ const LoginScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#ffffff',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '200',
-    color: '#000000',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  input: {
-    fontSize: 14,
-    marginBottom: 15,
-    backgroundColor: '#ffffff',
-  },
-  error: {
-    color: '#ff0000',
-    textAlign: 'center',
-    marginBottom: 15,
-  },
-  button: {
-    marginVertical: 10,
-    backgroundColor: '#0066cc',
-  },
-  link: {
-    color: '#0066cc',
-    textAlign: 'center',
-    marginTop: 15,
-  },
+  container: theme.components.loginContainer,
+  title: theme.components.loginTitle,
+  input: theme.components.loginInput,
+  error: theme.components.loginError,
+  button: theme.components.loginButton,
+  link: theme.components.loginLink,
 });
 
 export default LoginScreen;

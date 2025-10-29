@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { API_BASE_URL } from '../constants/api';
+import { theme } from '../constants/theme';
 import { useAuth } from '../providers/AuthProvider';
 
 const RegisterScreen: React.FC = () => {
@@ -52,37 +53,12 @@ const RegisterScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#ffffff',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000000',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  input: {
-    marginBottom: 15,
-    backgroundColor: '#f9f9f9',
-  },
-  error: {
-    color: '#ff0000',
-    textAlign: 'center',
-    marginBottom: 15,
-  },
-  button: {
-    marginVertical: 10,
-    backgroundColor: '#0066cc',
-  },
-  link: {
-    color: '#0066cc',
-    textAlign: 'center',
-    marginTop: 15,
-  },
+  container: theme.components.registerContainer,
+  title: theme.components.registerTitle,
+  input: theme.components.registerInput,
+  error: theme.components.registerError,
+  button: theme.components.registerButton,
+  link: theme.components.registerLink,
 });
 
 export default RegisterScreen;
