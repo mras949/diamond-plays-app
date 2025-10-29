@@ -34,7 +34,9 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
         if (isAuthenticated && !playerFetchAttempts[fetchKey]) {
             setFetchError(null); // Clear any previous errors
             
-            fetchPlayers(gameId, teamId).catch((error) => {
+            fetchPlayers(gameId, teamId).then((result) => {
+            }).catch((error) => {
+                console.log(`[PlayerList] fetchPlayers error for ${gameId}-${teamId}:`, error);
                 setFetchError('Failed to load players');
             });
         }

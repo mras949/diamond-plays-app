@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, TextStyle, View, ViewStyle } from 'react-native';
 import { Text } from 'react-native-paper';
 import { theme } from '../../constants/theme';
@@ -10,6 +10,12 @@ const GameList: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [expandedGameId, setExpandedGameId] = useState<string | null>(null);
   const [tabIndexes, setTabIndexes] = useState<Record<string, number>>({});
+
+  // Reset UI state when games change (date change)
+  useEffect(() => {
+    setExpandedGameId(null);
+    setTabIndexes({});
+  }, [games]);
 
   const onRefresh = useCallback(async () => {
     console.log('GameList: onRefresh called');

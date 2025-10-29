@@ -136,6 +136,14 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
     
     if (dateKey !== currentKey) {
       setSelectedDateState(date);
+      // Clear player data when date changes
+      setPlayers({});
+      setPlayerLoading({});
+      setPlayerFetchAttempts({});
+      setSelectedPlayers({});
+      setError(null);
+      // Clear refs
+      refs.current.playerFetchAttempts = {};
     }
   }, [selectedDate]);
 
@@ -151,13 +159,6 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
       return; // Already loading or already attempted
     }
 
-    // Cancel any existing player request
-    if (refs.current.playerAbortController) {
-      refs.current.playerAbortController.abort();
-    }
-
-    // Create new abort controller for this player request
-    refs.current.playerAbortController = new AbortController();
     refs.current.playerFetchAttempts[key] = true;
     setPlayerLoading(prev => ({ ...prev, [key]: true }));
 
@@ -170,23 +171,20 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
       const response = await axios.get(`${API_BASE_URL}/data/game-players?gameId=${gameId}&teamId=${teamId}`, {
         headers: { Authorization: `Bearer ${token}` },
         timeout: 10000, // 10 second timeout
-        signal: refs.current.playerAbortController.signal,
       });
-
 
       // Reset loading state immediately
       setPlayerLoading(prev => ({ ...prev, [key]: false }));
 
       const newPlayers = Array.isArray(response.data) ? response.data : [];
+      
       setPlayers(prev => {
-        const currentPlayers = prev[teamId] || [];
         // Always update the cache, even if it's an empty array
         return { ...prev, [teamId]: newPlayers };
       });
     } catch (err) {
       // Ensure loading state is reset even on error
       setPlayerLoading(prev => ({ ...prev, [key]: false }));
-      refs.current.playerAbortController = null;
     }
   }, []);
 
