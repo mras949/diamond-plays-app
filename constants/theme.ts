@@ -637,6 +637,10 @@ export const theme = {
       marginVertical: 10,
       backgroundColor: '#3b82f6', // theme.colors.primary
     } as ViewStyle,
+    googleButton: {
+      marginVertical: 10,
+      borderColor: '#3b82f6', // theme.colors.primary
+    } as ViewStyle,
     loginLink: {
       color: '#3b82f6', // theme.colors.primary
       textAlign: 'center',
