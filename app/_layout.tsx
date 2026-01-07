@@ -1,7 +1,6 @@
 import { Stack, useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { theme } from '../constants/theme';
 import { GameDataProvider } from '../contexts/GameDataContext';
 import { AuthProvider, useAuth } from '../providers/AuthProvider';
 
@@ -24,7 +23,7 @@ function AuthenticationGuard() {
 
   if (loading || logoutLoading) {
     return (
-      <View style={theme.components.layoutLoadingContainer}>
+      <View className="flex-1 justify-center items-center bg-background">
         <ActivityIndicator size="large" color="#3b82f6" />
       </View>
     );

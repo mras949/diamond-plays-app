@@ -1,13 +1,11 @@
 import { useEffect } from 'react';
 import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withSequence,
+    withTiming,
 } from 'react-native-reanimated';
-
-import { theme as appTheme } from '@/constants/theme';
 
 export function HelloWave() {
   const rotationAnimation = useSharedValue(0);
@@ -25,8 +23,8 @@ export function HelloWave() {
 
   return (
     <Animated.Text
+      className="text-3xl"
       style={[
-        appTheme.components.helloWaveText,
         {
           transform: [{ rotate: `${rotationAnimation.value}deg` }],
         },

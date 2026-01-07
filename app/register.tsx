@@ -1,10 +1,9 @@
 import axios from 'axios';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { API_BASE_URL } from '../constants/api';
-import { theme } from '../constants/theme';
 import { useAuth } from '../providers/AuthProvider';
 
 const RegisterScreen: React.FC = () => {
@@ -25,40 +24,33 @@ const RegisterScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+    <View className="flex-1 justify-center px-6 bg-background">
+      <Text className="text-3xl font-bold text-text text-center mb-8">Sign Up</Text>
       <TextInput
         label="Email"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
-        style={styles.input}
+        className="mb-4"
       />
       <TextInput
         label="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        style={styles.input}
+        className="mb-4"
       />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button mode="contained" onPress={handleRegister} style={styles.button}>
+      {error ? <Text className="text-error text-sm mb-4">{error}</Text> : null}
+      <Button mode="contained" onPress={handleRegister} className="mb-4">
         Register
       </Button>
-      <Text style={styles.link} onPress={() => router.push('/')}>
+      <Text className="text-primary text-center font-semibold" onPress={() => router.push('/')}>
         Already have an account? Log in
       </Text>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: theme.components.registerContainer,
-  title: theme.components.registerTitle,
-  input: theme.components.registerInput,
-  error: theme.components.registerError,
-  button: theme.components.registerButton,
-  link: theme.components.registerLink,
-});
+
 
 export default RegisterScreen;

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { RefreshControl, ScrollView, TextStyle, View, ViewStyle } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import { Text } from 'react-native-paper';
-import { theme } from '../../constants/theme';
 import { useGameData } from '../../contexts/GameDataContext';
 import GameAccordion from './GameAccordion';
 
@@ -34,8 +33,8 @@ const GameList: React.FC = () => {
 
   return (
     <ScrollView
-      style={styles.scrollContainer}
-      contentContainerStyle={styles.scrollContent}
+      className="flex-1"
+      contentContainerStyle={{ flexGrow: 1 }}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
@@ -43,7 +42,7 @@ const GameList: React.FC = () => {
         />
       }
     >
-      <View style={styles.gamesContainer}>
+      <View className="p-md">
         {games.length > 0 ? (
           games.map((game) => (
             <GameAccordion
@@ -56,18 +55,11 @@ const GameList: React.FC = () => {
             />
           ))
         ) : (
-          <Text style={styles.emptyText}>No games available for this date</Text>
+          <Text className="text-body-md text-secondary text-center py-lg">No games available for this date</Text>
         )}
       </View>
     </ScrollView>
   );
-};
-
-const styles = {
-  scrollContainer: theme.components.scrollContainer as ViewStyle,
-  scrollContent: theme.components.scrollContent as ViewStyle,
-  gamesContainer: theme.components.contentContainer as ViewStyle,
-  emptyText: theme.components.emptyText as TextStyle,
 };
 
 export default GameList;

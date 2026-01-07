@@ -1,9 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
-import { Dimensions, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Dimensions, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SceneMap, TabView } from 'react-native-tab-view';
 import { GameAccordionProps } from '../../constants/interfaces';
-import { theme } from '../../constants/theme';
 import { useGameData } from '../../contexts/GameDataContext';
 import { useAuth } from '../../providers/AuthProvider';
 import { PlayerList } from './PlayerList';
@@ -56,31 +55,23 @@ const getGameTimeDisplay = (game: any): string => {
 
 const CustomTabBar = ({ navigationState, jumpTo, position }: any) => {
     return (
-        <View style={[styles.tabBar, styles.customTabBar]}>
+        <View className="flex-row h-12 bg-surface border-b border-outline">
             {navigationState.routes.map((route: any, index: number) => {
                 const isActive = navigationState.index === index;
                 return (
                     <TouchableOpacity
                         key={route.key}
-                        style={styles.tabItem}
+                        className="flex-1 items-center justify-center py-3 px-0 relative min-h-9"
                         onPress={() => jumpTo(route.key)}
                     >
                         <Text
-                            style={[
-                                styles.tabLabel,
-                                {
-                                    color: isActive ? '#3b82f6' : '#71717a',
-                                    fontSize: 12,
-                                    fontWeight: '500',
-                                    textAlign: 'center',
-                                    includeFontPadding: false,
-                                    textAlignVertical: 'center'
-                                }
-                            ]}
+                            className={`text-xs font-medium capitalize text-center ${
+                                isActive ? 'text-primary' : 'text-secondary'
+                            }`}
                         >
                             {route.title}
                         </Text>
-                        {isActive && <View style={styles.tabIndicatorActive} />}
+                        {isActive && <View className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
                     </TouchableOpacity>
                 );
             })}
@@ -109,7 +100,7 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
 
     // Memoize tab components to prevent re-renders
     const AwayTab = useCallback(() => (
-        <View style={styles.tabContent}>
+        <View className="flex-1 p-0 bg-background">
             <PlayerList
                 gameId={game._id}
                 teamId={game.awayTeam._id}
@@ -119,7 +110,7 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
     ), [game._id, game.awayTeam._id, handleSelectionChange]);
 
     const HomeTab = useCallback(() => (
-        <View style={styles.tabContent}>
+        <View className="flex-1 p-0 bg-background">
             <PlayerList
                 gameId={game._id}
                 teamId={game.homeTeam._id}
@@ -141,57 +132,57 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
     }), [AwayTab, HomeTab]);
 
     return (
-        <View style={styles.container}>
+        <View className="my-1 bg-surface rounded-md overflow-hidden">
             <TouchableOpacity
-                style={[styles.accordionTrigger, isExpanded && styles.accordionTriggerExpanded]}
+                className="py-2.5 px-5 bg-surface"
                 onPress={onToggleExpand}
                 activeOpacity={0.7}
             >
-                <View style={styles.triggerContent}>
-                    <View style={styles.awayTeamSection}>
-                        <Text variant="titleMedium" style={styles.teamCity}>
+                <View className="flex-row items-center justify-center gap-4">
+                    <View className="w-10/12 items-end">
+                        <Text className="text-xs font-light text-on-surface text-center leading-4 tracking-tight">
                             {game.awayTeam.city}
                         </Text>
-                        <Text variant="titleMedium" style={styles.teamName}>
+                        <Text className="text-sm font-black text-on-surface text-center leading-4 tracking-tight">
                             {game.awayTeam.teamName}
                         </Text>
                         {selectedPlayers[game.awayTeam._id] ? (
-                            <Text variant="bodySmall" style={styles.selectedPlayer}>
-                                {selectedPlayers[game.awayTeam._id]?.name || 
-                                 selectedPlayers[game.awayTeam._id]?.player?.name || 
+                            <Text className="text-xs font-normal text-primary text-center tracking-tight">
+                                {selectedPlayers[game.awayTeam._id]?.name ||
+                                 selectedPlayers[game.awayTeam._id]?.player?.name ||
                                  'Selected Player'}
                             </Text>
                         ) : (
-                            <Text variant="bodySmall" style={styles.noSelection}>
+                            <Text className="text-xs font-normal text-secondary text-center tracking-tight">
                                 No Selection
                             </Text>
                         )}
                     </View>
-                    <View style={styles.centerSection}>
-                        <Text variant="bodyMedium" style={styles.gameStatus}>
+                    <View className="w-2/12 items-center gap-0.5">
+                        <Text className="text-xs font-medium text-on-surface capitalize text-center p-0 m-0 leading-3 tracking-tight">
                             {getGameStatusDisplay(game)}
                         </Text>
                         {getGameTimeDisplay(game) && (
-                            <Text variant="bodyMedium" style={styles.gameDateTime}>
+                            <Text className="text-sm font-black text-on-surface-variant text-center p-0 m-0 leading-3 tracking-tight">
                                 {getGameTimeDisplay(game)}
                             </Text>
                         )}
                     </View>
-                    <View style={styles.homeTeamSection}>
-                        <Text variant="titleMedium" style={styles.teamCity}>
+                    <View className="w-10/12 items-start">
+                        <Text className="text-xs font-light text-on-surface text-center leading-4 tracking-tight">
                             {game.homeTeam.city}
                         </Text>
-                        <Text variant="titleMedium" style={styles.teamName}>
+                        <Text className="text-sm font-black text-on-surface text-center leading-4 tracking-tight">
                             {game.homeTeam.teamName}
                         </Text>
                         {selectedPlayers[game.homeTeam._id] ? (
-                            <Text variant="bodySmall" style={styles.selectedPlayer}>
-                                {selectedPlayers[game.homeTeam._id]?.name || 
-                                 selectedPlayers[game.homeTeam._id]?.player?.name || 
+                            <Text className="text-xs font-normal text-primary text-center tracking-tight">
+                                {selectedPlayers[game.homeTeam._id]?.name ||
+                                 selectedPlayers[game.homeTeam._id]?.player?.name ||
                                  'Selected Player'}
                             </Text>
                         ) : (
-                            <Text variant="bodySmall" style={styles.noSelection}>
+                            <Text className="text-xs font-normal text-secondary text-center tracking-tight">
                                 No Selection
                             </Text>
                         )}
@@ -200,8 +191,8 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
             </TouchableOpacity>
 
             {isExpanded && (
-                <View style={styles.expandedContent}>
-                    <View style={styles.tabViewContainer}>
+                <View className="p-0">
+                    <View className="h-80 mt-2 bg-surface">
                         <TabView
                             navigationState={{
                                 index: tabIndex,
@@ -211,7 +202,7 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
                             onIndexChange={onTabChange}
                             initialLayout={{ width: Dimensions.get('window').width }}
                             renderTabBar={CustomTabBar}
-                            style={styles.tabView}
+                            className="flex-1"
                         />
                     </View>
                 </View>
@@ -223,31 +214,4 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
 const GameAccordionMemo = React.memo(GameAccordionComponent);
 export default GameAccordionMemo;
 
-const styles = {
-    container: theme.components.gameAccordionContainer as ViewStyle,
-    accordionTrigger: theme.components.gameAccordionTrigger as ViewStyle,
-    accordionTriggerExpanded: theme.components.gameAccordionTriggerExpanded as ViewStyle,
-    triggerContent: theme.components.gameAccordionTriggerContent as ViewStyle,
-    homeTeamSection: theme.components.gameAccordionHomeTeamSection as ViewStyle,
-    awayTeamSection: theme.components.gameAccordionAwayTeamSection as ViewStyle,
-    centerSection: theme.components.gameAccordionCenterSection as ViewStyle,
-    titleRow: theme.components.gameAccordionTitleRow as ViewStyle,
-    vsText: theme.components.gameAccordionVsText as TextStyle,
-    statusRow: theme.components.gameAccordionStatusRow as ViewStyle,
-    teamCity: theme.components.gameAccordionTeamCity as TextStyle,
-    teamName: theme.components.gameAccordionTeamName as TextStyle,
-    selectedPlayer: theme.components.gameAccordionSelectedPlayer as TextStyle,
-    noSelection: theme.components.gameAccordionNoSelection as TextStyle,
-    gameStatus: theme.components.gameAccordionGameStatus as TextStyle,
-    gameDateTime: theme.components.gameAccordionGameDateTime as TextStyle,
-    expandedContent: theme.components.expandedContent as ViewStyle,
-    tabViewContainer: theme.components.tabViewContainer as ViewStyle,
-    tabBar: theme.components.tabBar as ViewStyle,
-    tabIndicator: theme.components.tabIndicator as ViewStyle,
-    tabView: theme.components.tabView as ViewStyle,
-    tabContent: theme.components.tabContent as ViewStyle,
-    customTabBar: theme.components.gameAccordionCustomTabBar as ViewStyle,
-    tabLabel: theme.components.gameAccordionTabLabel as TextStyle,
-    tabItem: theme.components.gameAccordionTabItem as ViewStyle,
-    tabIndicatorActive: theme.components.gameAccordionTabIndicatorActive as ViewStyle,
-};
+

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Dimensions, ScrollView, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Dimensions, ScrollView, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
-import { theme } from '../../constants/theme';
 import { useGameData } from '../../contexts/GameDataContext';
 
 const DateSelector: React.FC = () => {
@@ -82,13 +81,13 @@ const DateSelector: React.FC = () => {
   }, [dateList, selectedDate]);
 
   return (
-    <View style={styles.dateSelectorContainer}>
+    <View className="py-1 px-4 bg-surface">
       <ScrollView
         ref={dateScrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.dateScrollView}
-        contentContainerStyle={styles.dateScrollContent}
+        className="h-10"
+        contentContainerStyle={{ paddingHorizontal: 8, alignItems: 'center' }}
       >
         {dateList.map((date, index) => {
           const isSelected = date.toDateString() === selectedDate.toDateString();
@@ -97,29 +96,23 @@ const DateSelector: React.FC = () => {
           return (
             <TouchableOpacity
               key={index}
-              style={[
-                styles.dateItem,
-                isSelected && styles.dateItemSelected,
-                isDisabled && styles.dateItemDisabled,
-              ]}
+              className={`w-18 h-10 mx-1 items-center justify-center ${
+                isDisabled ? 'opacity-50' : ''
+              }`}
               onPress={() => !isDisabled && setSelectedDate(date)}
               disabled={isDisabled}
             >
               <Text
-                style={[
-                  styles.dateItemText,
-                  isSelected && styles.dateItemTextSelected,
-                  isDisabled && styles.dateItemTextDisabled,
-                ]}
+                className={`text-xs font-semibold text-center leading-2.5 ${
+                  isSelected ? 'text-primary' : 'text-onSurfaceVariant'
+                } ${isDisabled ? 'opacity-50' : ''}`}
               >
                 {formatDateForDisplay(date)}
               </Text>
               <Text
-                style={[
-                  styles.dateItemSubText,
-                  isSelected && styles.dateItemSubTextSelected,
-                  isDisabled && styles.dateItemSubTextDisabled,
-                ]}
+                className={`text-xs text-center mt-0.5 leading-2.5 ${
+                  isSelected ? 'text-primary opacity-90' : 'text-onSurfaceVariant opacity-70'
+                } ${isDisabled ? 'opacity-50' : ''}`}
               >
                 {date.toLocaleDateString('en-US', { weekday: 'short' })}
               </Text>
@@ -131,62 +124,6 @@ const DateSelector: React.FC = () => {
   );
 };
 
-const styles = {
-  dateSelectorContainer: {
-    paddingVertical: 4,
-    paddingHorizontal: 16,
-    backgroundColor: theme.colors.surface,
-  } as ViewStyle,
-  dateScrollView: {
-    height: 40,
-  } as ViewStyle,
-  dateScrollContent: {
-    paddingHorizontal: 8,
-    alignItems: 'center',
-  } as ViewStyle,
-  dateItem: {
-    width: 70,
-    height: 40,
-    marginHorizontal: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-  } as ViewStyle,
-  dateItemSelected: {
 
-  } as ViewStyle,
-  dateItemDisabled: {
-    opacity: 0.5,
-  } as ViewStyle,
-  dateItemText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: theme.colors.onSurfaceVariant,
-    textAlign: 'center',
-    lineHeight: 10,
-  } as TextStyle,
-  dateItemTextSelected: {
-    color: theme.colors.primary,
-  } as TextStyle,
-  dateItemTextDisabled: {
-    color: theme.colors.onSurfaceVariant,
-    opacity: 0.5,
-  } as TextStyle,
-  dateItemSubText: {
-    fontSize: 10,
-    color: theme.colors.onSurfaceVariant,
-    opacity: 0.7,
-    textAlign: 'center',
-    marginTop: 2,
-    lineHeight: 10,
-  } as TextStyle,
-  dateItemSubTextSelected: {
-    color: theme.colors.primary,
-    opacity: 0.9,
-  } as TextStyle,
-  dateItemSubTextDisabled: {
-    color: theme.colors.onSurfaceVariant,
-    opacity: 0.5,
-  } as TextStyle,
-};
 
 export default DateSelector;

@@ -1,43 +1,30 @@
-import { StyleSheet, Text, type TextProps } from 'react-native';
+import { Text, type TextProps } from 'react-native';
 
-import { theme } from '@/constants/theme';
-import { useThemeColor } from '@/hooks/useThemeColor';
+import { cn } from '@/lib/utils';
 
 export type ThemedTextProps = TextProps & {
-  lightColor?: string;
-  darkColor?: string;
   type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
+  className?: string;
 };
 
 export function ThemedText({
   style,
-  lightColor,
-  darkColor,
   type = 'default',
+  className,
   ...rest
 }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
-
   return (
     <Text
-      style={[
-        { color },
-        type === 'default' ? styles.default : undefined,
-        type === 'title' ? styles.title : undefined,
-        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
-        type === 'subtitle' ? styles.subtitle : undefined,
-        type === 'link' ? styles.link : undefined,
-        style,
-      ]}
+      className={cn(
+        className,
+        type === 'default' && 'text-base text-text',
+        type === 'title' && 'text-3xl font-bold text-text',
+        type === 'defaultSemiBold' && 'text-base font-semibold text-text',
+        type === 'subtitle' && 'text-lg font-bold text-text',
+        type === 'link' && 'text-base text-primary'
+      )}
+      style={style}
       {...rest}
     />
   );
 }
-
-const styles = StyleSheet.create({
-  default: theme.components.textDefault,
-  defaultSemiBold: theme.components.textDefaultSemiBold,
-  title: theme.components.textTitle,
-  subtitle: theme.components.textSubtitle,
-  link: theme.components.textLink,
-});

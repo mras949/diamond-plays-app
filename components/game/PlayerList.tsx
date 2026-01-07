@@ -1,9 +1,8 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { ActivityIndicator, FlatList, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { GamePlayer, PlayerListProps } from '../../constants/interfaces';
-import { theme } from '../../constants/theme';
 import { useGameData } from '../../contexts/GameDataContext';
 import { useAuth } from '../../providers/AuthProvider';
 
@@ -84,35 +83,39 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
 
         return (
             <TouchableOpacity
-                style={[
-                    styles.playerRow,
-                    isSelected && styles.playerRowSelected,
-                    isSaving && styles.playerRowSaving
-                ]}
+                className={`flex-row justify-between items-center py-2 px-2 border-b border-outline bg-background ${
+                    isSelected ? 'bg-selected' : ''
+                } ${isSaving ? 'opacity-70' : ''}`}
                 onPress={() => handlePlayerSelect(item)}
                 disabled={savingSelection}
             >
-                <View style={styles.playerInfo}>
-                    <Text style={[styles.battingOrder, isSelected && styles.textSelected]}>
+                <View className="flex-row items-center flex-1">
+                    <Text className={`w-8 text-center font-regular text-xs ${
+                        isSelected ? 'text-primary font-semibold' : 'text-secondary'
+                    }`}>
                         {item.battingOrder}
                     </Text>
-                    <Text style={[styles.playerName, isSelected && styles.textSelected]}>
+                    <Text className={`flex-1 ml-2 font-regular text-xs ${
+                        isSelected ? 'text-primary font-semibold' : 'text-text'
+                    }`}>
                         {getPlayerName(item)}
                     </Text>
                     {isSelected && (
-                        <View style={styles.selectionIndicator}>
-                            <Text style={styles.checkmark}>✓</Text>
+                        <View className="ml-2 w-5 h-5 rounded-full bg-primary items-center justify-center">
+                            <Text className="text-white text-xs font-bold">✓</Text>
                         </View>
                     )}
                 </View>
-                <Text style={[styles.playerPosition, isSelected && styles.textSelected]}>
+                <Text className={`w-12 text-right font-regular text-xs ${
+                    isSelected ? 'text-primary font-semibold' : 'text-secondary'
+                }`}>
                     {getPlayerPosition(item)}
                 </Text>
                 {isSaving && (
                     <ActivityIndicator
                         size="small"
-                        color={theme.colors.primary}
-                        style={styles.savingIndicator}
+                        color="#3b82f6"
+                        className="absolute right-2"
                     />
                 )}
             </TouchableOpacity>
@@ -121,16 +124,16 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
 
     if (fetchError) {
         return (
-            <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>{fetchError}</Text>
-                <TouchableOpacity 
-                    style={styles.retryButton}
+            <View className="flex-1 justify-center items-center p-4">
+                <Text className="text-error text-center mb-4">{fetchError}</Text>
+                <TouchableOpacity
+                    className="bg-primary px-4 py-2 rounded-md"
                     onPress={() => {
                         resetPlayerFetchAttempt(gameId, teamId);
                         setFetchError(null);
                     }}
                 >
-                    <Text style={styles.retryText}>Retry</Text>
+                    <Text className="text-white font-semibold">Retry</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -138,16 +141,16 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
 
     if (shouldShowLoading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={theme.colors.primary} />
+            <View className="flex-1 justify-center items-center">
+                <ActivityIndicator size="large" color="#3b82f6" />
             </View>
         );
     }
 
     if (currentPlayers.length === 0) {
         return (
-            <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>Lineup not set</Text>
+            <View className="flex-1 justify-center items-center p-4">
+                <Text className="text-secondary text-center">Lineup not set</Text>
             </View>
         );
     }
@@ -158,31 +161,9 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
             renderItem={renderPlayerRow}
             keyExtractor={(item) => item._id}
             scrollEnabled={false}
-            style={styles.container}
+            className="flex-1"
         />
     );
 });
 
 PlayerList.displayName = 'PlayerList';
-
-const styles = {
-    container: theme.components.container as ViewStyle,
-    loadingContainer: theme.components.loadingContainer as ViewStyle,
-    emptyContainer: theme.components.emptyContainer as ViewStyle,
-    errorContainer: theme.components.playerListErrorContainer as ViewStyle,
-    emptyText: theme.components.emptyText as TextStyle,
-    errorText: theme.components.playerListErrorText as TextStyle,
-    playerRow: theme.components.playerRow as ViewStyle,
-    playerInfo: theme.components.playerInfo as ViewStyle,
-    battingOrder: theme.components.battingOrder as TextStyle,
-    playerName: theme.components.playerName as TextStyle,
-    playerPosition: theme.components.playerPosition as TextStyle,
-    playerRowSelected: theme.components.playerListRowSelected as ViewStyle,
-    playerRowSaving: theme.components.playerListRowSaving as ViewStyle,
-    textSelected: theme.components.playerListTextSelected as TextStyle,
-    selectionIndicator: theme.components.playerListSelectionIndicator as ViewStyle,
-    checkmark: theme.components.playerListCheckmark as TextStyle,
-    savingIndicator: theme.components.playerListSavingIndicator as ViewStyle,
-    retryButton: theme.components.playerListRetryButton as ViewStyle,
-    retryText: theme.components.playerListRetryText as TextStyle,
-};

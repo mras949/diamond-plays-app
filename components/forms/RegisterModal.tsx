@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Animated, KeyboardAvoidingView, Modal, PanResponder, Platform, TouchableOpacity, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { API_BASE_URL } from '../../constants/api';
-import { theme } from '../../constants/theme';
 import { useAuth } from '../../providers/AuthProvider';
 
 interface RegisterModalProps {
@@ -202,16 +201,16 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
       transparent={true}
       onRequestClose={onClose}
     >
-      <View style={theme.components.modalContainer}>
-        <BlurView style={theme.components.modalBackdrop} intensity={20} />
-        <TouchableOpacity style={theme.components.modalBackdrop} onPress={onClose} />
-        <View style={theme.components.modalWrapper}>
-          <KeyboardAvoidingView style={theme.components.modalWrapper} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <Animated.View style={[theme.components.modalContent, animatedStyle]} {...panResponder.panHandlers}>
-              <View style={theme.components.modalHandleContainer}>
-                <View style={theme.components.modalHandle} />
+      <View className="flex-1">
+        <BlurView className="absolute inset-0" intensity={20} />
+        <TouchableOpacity className="absolute inset-0" onPress={onClose} />
+        <View className="flex-1 justify-end">
+          <KeyboardAvoidingView className="flex-1 justify-end" behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <Animated.View className="bg-surface rounded-t-3xl p-6 pb-8" style={[animatedStyle]} {...panResponder.panHandlers}>
+              <View className="items-center mb-4">
+                <View className="w-12 h-1.5 bg-outline rounded-full" />
               </View>
-              <Text style={theme.components.modalTitle}>Create Account</Text>
+              <Text className="text-xl font-bold text-text mb-6 text-center">Create Account</Text>
 
               <TextInput
                 label="Email"
@@ -219,7 +218,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 onChangeText={setEmail}
                 autoCapitalize="none"
                 keyboardType="email-address"
-                style={theme.components.modalInput}
+                className="mb-4"
               />
 
               <TextInput
@@ -227,7 +226,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
-                style={theme.components.modalInput}
+                className="mb-4"
               />
 
               <TextInput
@@ -235,18 +234,17 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry
-                style={theme.components.modalInput}
+                className="mb-4"
               />
 
               {password && confirmPassword && password === confirmPassword ? (
-                <Text style={theme.components.modalSuccessText}>✓ Passwords match</Text>
+                <Text className="text-success text-sm mb-4">✓ Passwords match</Text>
               ) : null}
 
               {error ? (
-                <Text style={[
-                  theme.components.modalError,
-                  password && confirmPassword && password !== confirmPassword ? theme.components.modalValidationError : theme.components.modalServerError
-                ]}>
+                <Text className={`text-sm mb-4 ${
+                  password && confirmPassword && password !== confirmPassword ? 'text-warning' : 'text-error'
+                }`}>
                   {error}
                 </Text>
               ) : null}
@@ -254,16 +252,16 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               <Button
                 mode="contained"
                 onPress={handleRegister}
-                style={theme.components.modalButton}
+                className="mb-4"
                 loading={loading}
                 disabled={loading}
               >
                 {loading ? 'Creating Account...' : 'Sign Up'}
               </Button>
 
-              <TouchableOpacity onPress={onSwitchToLogin} style={theme.components.modalSwitchContainer}>
-                <Text style={theme.components.modalSwitchText}>
-                  Already have an account? <Text style={theme.components.modalSwitchLink}>Log in</Text>
+              <TouchableOpacity onPress={onSwitchToLogin} className="items-center">
+                <Text className="text-secondary text-sm">
+                  Already have an account? <Text className="text-primary font-semibold">Log in</Text>
                 </Text>
               </TouchableOpacity>
             </Animated.View>

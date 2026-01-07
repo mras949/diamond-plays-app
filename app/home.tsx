@@ -1,11 +1,10 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { AppState, AppStateStatus, TextStyle, View, ViewStyle } from 'react-native';
+import { AppState, AppStateStatus, View } from 'react-native';
 import { Appbar, Text } from 'react-native-paper';
 import DateSelector from '../components/forms/DateSelector';
 import GameList from '../components/game/GameList';
 import { Sidebar } from '../components/navigation/Sidebar';
-import { theme } from '../constants/theme';
 import { useGameData } from '../contexts/GameDataContext';
 import { useAuth } from '../providers/AuthProvider';
 
@@ -48,7 +47,7 @@ const HomeScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <View className="flex-1 bg-background">
             <Appbar.Header>
                 <Appbar.Action
                     icon="menu"
@@ -64,29 +63,19 @@ const HomeScreen = () => {
                 logoutLoading={logoutLoading}
             />
             {loading && (
-                <View style={styles.loadingOverlay}>
-                    <Text>Loading...</Text>
+                <View className="absolute inset-0 bg-background bg-opacity-75 justify-center items-center">
+                    <Text className="text-text">Loading...</Text>
                 </View>
             )}
             {error && (
-                <View style={styles.errorOverlay}>
-                    <Text style={styles.errorText}>{error}</Text>
+                <View className="absolute bottom-0 left-0 right-0 bg-error p-4">
+                    <Text className="text-white text-center">{error}</Text>
                 </View>
             )}
         </View>
     );
 };
 
-const styles = {
-    container: theme.components.container as ViewStyle,
-    loadingContainer: theme.components.loadingContainer as ViewStyle,
-    errorContainer: theme.components.homeErrorContainer as ViewStyle,
-    errorTitle: theme.components.homeErrorTitle as TextStyle,
-    errorMessage: theme.components.homeErrorMessage as TextStyle,
-    errorHint: theme.components.homeErrorHint as TextStyle,
-    loadingOverlay: theme.components.homeLoadingOverlay as ViewStyle,
-    errorOverlay: theme.components.homeErrorOverlay as ViewStyle,
-    errorText: theme.components.homeErrorText as TextStyle,
-};
+
 
 export default HomeScreen;

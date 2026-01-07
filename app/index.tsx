@@ -3,11 +3,10 @@ import * as Google from 'expo-auth-session/providers/google';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { RegisterModal } from '../components/forms/RegisterModal';
 import { API_BASE_URL } from '../constants/api';
-import { theme } from '../constants/theme';
 import { useAuth } from '../providers/AuthProvider';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -55,30 +54,30 @@ const LoginScreen: React.FC = () => {
 
   return (
     <>
-      <View style={styles.container}>
-        <Text style={styles.title}>Diamond Plays</Text>
+      <View className="flex-1 justify-center px-6 bg-background">
+        <Text className="text-3xl font-bold text-text text-center mb-8">Diamond Plays</Text>
         <TextInput
           label="Email"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
-          style={styles.input}
+          className="mb-4"
         />
         <TextInput
           label="Password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
-          style={styles.input}
+          className="mb-4"
         />
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        <Button mode="contained" onPress={handleLogin} style={styles.button}>
+        {error ? <Text className="text-error text-sm mb-4">{error}</Text> : null}
+        <Button mode="contained" onPress={handleLogin} className="mb-4">
           Login
         </Button>
-        <Button mode="outlined" onPress={() => promptAsync()} style={styles.googleButton}>
+        <Button mode="outlined" onPress={() => promptAsync()} className="mb-4">
           Login with Google
         </Button>
-        <Text style={styles.link} onPress={() => setRegisterModalVisible(true)}>
+        <Text className="text-primary text-center font-semibold" onPress={() => setRegisterModalVisible(true)}>
           Don’t have an account? Sign up
         </Text>
       </View>
@@ -91,14 +90,6 @@ const LoginScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: theme.components.loginContainer,
-  title: theme.components.loginTitle,
-  input: theme.components.loginInput,
-  error: theme.components.loginError,
-  button: theme.components.loginButton,
-  googleButton: theme.components.googleButton,
-  link: theme.components.loginLink,
-});
+
 
 export default LoginScreen;
