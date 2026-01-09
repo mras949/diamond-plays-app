@@ -1,6 +1,7 @@
 import React from 'react';
 import { Animated, Dimensions, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
+import { useCustomTheme } from '../../constants/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -17,6 +18,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLogout,
   logoutLoading,
 }) => {
+  const theme = useCustomTheme();
   const slideAnim = React.useRef(new Animated.Value(-width * 0.75)).current;
   const [isRendered, setIsRendered] = React.useState(false);
 
@@ -45,22 +47,52 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <>
       {/* Backdrop */}
       <TouchableOpacity
+        style={theme.styles.components.navigation.backdrop}
         activeOpacity={1}
         onPress={onClose}
       />
 
       {/* Sidebar */}
-      <Animated.View>
-        <View>
-          <Text>Menu</Text>
+      <Animated.View
+        style={[
+          theme.styles.components.navigation.sidebar,
+          {
+            backgroundColor: theme.colors.surface,
+            transform: [{ translateX: slideAnim }],
+          },
+        ]}
+      >
+        <View style={theme.styles.components.navigation.header}>
+          <Text style={[theme.styles.components.navigation.headerText, { color: theme.colors.onSurface }]}>
+            Menu
+          </Text>
         </View>
 
-        <View>
+        <View style={theme.styles.components.navigation.content}>
           <TouchableOpacity
+            style={[
+              theme.styles.components.navigation.menuItem,
+              {
+                backgroundColor: logoutLoading
+                  ? theme.colors.surfaceDisabled
+                  : theme.colors.surfaceVariant,
+                borderColor: theme.colors.outline,
+              },
+            ]}
             onPress={onLogout}
             disabled={logoutLoading}
+            activeOpacity={0.7}
           >
-            <Text>
+            <Text
+              style={[
+                theme.styles.components.navigation.menuItemText,
+                {
+                  color: logoutLoading
+                    ? theme.colors.onSurfaceDisabled
+                    : theme.colors.onSurface,
+                },
+              ]}
+            >
               {logoutLoading ? 'Logging out...' : 'Logout'}
             </Text>
           </TouchableOpacity>
@@ -69,3 +101,5 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </>
   );
 };
+
+export default Sidebar;

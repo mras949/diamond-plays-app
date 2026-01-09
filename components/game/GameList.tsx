@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 import { Text } from 'react-native-paper';
+import { useCustomTheme } from '../../constants/theme';
 import { useGameData } from '../../contexts/GameDataContext';
 import GameAccordion from './GameAccordion';
 
 const GameList: React.FC = () => {
-  const { games, refreshGames, refreshAllData, selectPlayer } = useGameData();
+  const theme = useCustomTheme();
+  const { games, refreshAllData } = useGameData();
   const [refreshing, setRefreshing] = useState(false);
   const [expandedGameId, setExpandedGameId] = useState<string | null>(null);
   const [tabIndexes, setTabIndexes] = useState<Record<string, number>>({});
@@ -33,29 +35,35 @@ const GameList: React.FC = () => {
 
   return (
     <ScrollView
+      style={[theme.styles.components.list.container, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={games.length === 0 ? theme.styles.components.list.emptyContainer : theme.styles.components.list.contentContainer}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
+          colors={[theme.colors.primary]}
+          tintColor={theme.colors.primary}
         />
       }
     >
-      <View>
-        {games.length > 0 ? (
-          games.map((game) => (
-            <GameAccordion
-              key={game._id}
-              game={game}
-              isExpanded={expandedGameId === game._id}
-              onToggleExpand={() => handleToggleExpand(game._id)}
-              tabIndex={tabIndexes[game._id] || 0}
-              onTabChange={(index) => handleTabChange(game._id, index)}
-            />
-          ))
-        ) : (
-          <Text>No games available for this date</Text>
-        )}
-      </View>
+      {games.length > 0 ? (
+        games.map((game) => (
+          <GameAccordion
+            key={game._id}
+            game={game}
+            isExpanded={expandedGameId === game._id}
+            onToggleExpand={() => handleToggleExpand(game._id)}
+            tabIndex={tabIndexes[game._id] || 0}
+            onTabChange={(index) => handleTabChange(game._id, index)}
+          />
+        ))
+      ) : (
+        <View style={theme.styles.components.list.emptyState}>
+          <Text style={[theme.styles.components.list.emptyText, { color: theme.colors.onSurfaceVariant }]}>
+            No games available for this date
+          </Text>
+        </View>
+      )}
     </ScrollView>
   );
 };

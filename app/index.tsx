@@ -1,12 +1,12 @@
 import axios from 'axios';
 import * as Google from 'expo-auth-session/providers/google';
-import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 import { RegisterModal } from '../components/forms/RegisterModal';
 import { API_BASE_URL } from '../constants/api';
+import { useCustomTheme } from '../constants/theme';
 import { useAuth } from '../providers/AuthProvider';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -16,13 +16,22 @@ const LoginScreen: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [registerModalVisible, setRegisterModalVisible] = useState(false);
-  const router = useRouter();
   const { login } = useAuth();
+  const theme = useCustomTheme();
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
+  const [, response, promptAsync] = Google.useAuthRequest({
     clientId: 'YOUR_GOOGLE_CLIENT_ID', // Replace with your Google Client ID
     scopes: ['openid', 'profile', 'email'],
   });
+
+  const handleGoogleLogin = useCallback(async (idToken: string) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/auth/login/google`, { idToken });
+      await login(response.data.token);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Google login failed.');
+    }
+  }, [login]);
 
   useEffect(() => {
     if (response?.type === 'success') {
@@ -31,16 +40,7 @@ const LoginScreen: React.FC = () => {
         handleGoogleLogin(authentication.idToken);
       }
     }
-  }, [response]);
-
-  const handleGoogleLogin = async (idToken: string) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/auth/login/google`, { idToken });
-      await login(response.data.token);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Google login failed.');
-    }
-  };
+  }, [response, handleGoogleLogin]);
 
   const handleLogin = async () => {
     try {
@@ -54,39 +54,79 @@ const LoginScreen: React.FC = () => {
 
   return (
     <>
-      <View>
-        <Text>Diamond Plays</Text>
-        <View>
+      <View style={theme.styles.components.form.container}>
+        <View style={theme.styles.components.form.header}>
+          <Text style={[theme.styles.components.text.title, { color: theme.colors.primary }]}>
+            Diamond Plays
+          </Text>
+        </View>
+
+        <View style={theme.styles.components.form.content}>
           <TextInput
             label="Email"
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
+            keyboardType="email-address"
+            mode="outlined"
+            style={theme.styles.components.input}
+            theme={{
+              colors: {
+                background: theme.colors.surface,
+                onSurface: theme.colors.onSurface,
+              }
+            }}
           />
-        </View>
-        <View>
+
           <TextInput
             label="Password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            mode="outlined"
+            style={theme.styles.components.input}
+            theme={{
+              colors: {
+                background: theme.colors.surface,
+                onSurface: theme.colors.onSurface,
+              }
+            }}
           />
-        </View>
-        {error ? <Text>{error}</Text> : null}
-        <View>
-          <Button mode="contained" onPress={handleLogin}>
+
+          {error ? (
+            <Text style={theme.styles.components.text.error}>
+              {error}
+            </Text>
+          ) : null}
+
+          <Button
+            mode="contained"
+            onPress={handleLogin}
+            style={theme.styles.components.button}
+            contentStyle={{ paddingVertical: 8 }}
+          >
             Login
           </Button>
-        </View>
-        <View>
-          <Button mode="outlined" onPress={() => promptAsync()}>
+
+          <Button
+            mode="outlined"
+            onPress={() => promptAsync()}
+            style={theme.styles.components.button}
+            contentStyle={{ paddingVertical: 8 }}
+            textColor={theme.colors.primary}
+          >
             Login with Google
           </Button>
+
+          <Text
+            style={theme.styles.components.form.link}
+            onPress={() => setRegisterModalVisible(true)}
+          >
+            Don&apos;t have an account? Sign up
+          </Text>
         </View>
-        <Text onPress={() => setRegisterModalVisible(true)}>
-          Don't have an account? Sign up
-        </Text>
       </View>
+
       <RegisterModal
         visible={registerModalVisible}
         onClose={() => setRegisterModalVisible(false)}
@@ -97,5 +137,7 @@ const LoginScreen: React.FC = () => {
 };
 
 
+
+// Styles are now defined in the theme
 
 export default LoginScreen;

@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { theme } from './constants/theme';
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -19,15 +20,20 @@ export default function App() {
 
   if (!fontsLoaded) {
     return (
-      <View>
-        <ActivityIndicator size="large" color="#3b82f6" />
+      <View style={{
+        flex: 1,
+        backgroundColor: theme.colors.background,
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
 
   return (
     <SafeAreaProvider>
-      <PaperProvider>
+      <PaperProvider theme={theme}>
         <Slot />
       </PaperProvider>
     </SafeAreaProvider>

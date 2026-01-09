@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, ScrollView, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
+import { useCustomTheme } from '../../constants/theme';
 import { useGameData } from '../../contexts/GameDataContext';
 
 const DateSelector: React.FC = () => {
   const { selectedDate, setSelectedDate } = useGameData();
+  const theme = useCustomTheme();
 
   const dateScrollRef = useRef<ScrollView>(null);
   const currentDateKeyRef = useRef<string>('');
@@ -81,11 +83,13 @@ const DateSelector: React.FC = () => {
   }, [dateList, selectedDate]);
 
   return (
-    <View>
+    <View style={[theme.styles.components.form.dateSelector.container, { backgroundColor: theme.colors.surface }]}>
       <ScrollView
         ref={dateScrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={theme.styles.components.form.dateSelector.scrollView}
+        contentContainerStyle={theme.styles.components.form.dateSelector.scrollContent}
       >
         {dateList.map((date, index) => {
           const isSelected = date.toDateString() === selectedDate.toDateString();
@@ -94,13 +98,53 @@ const DateSelector: React.FC = () => {
           return (
             <TouchableOpacity
               key={index}
+              style={[
+                theme.styles.components.form.dateSelector.dateItem,
+                {
+                  backgroundColor: isSelected
+                    ? theme.colors.primary
+                    : isDisabled
+                    ? theme.colors.surfaceDisabled
+                    : theme.colors.surface,
+                  borderWidth: isSelected ? 0 : 1,
+                  borderColor: isSelected ? 'transparent' : theme.colors.outline,
+                },
+                isSelected && theme.styles.components.form.dateSelector.selectedDateItem,
+                isDisabled && theme.styles.components.form.dateSelector.disabledDateItem,
+              ]}
               onPress={() => !isDisabled && setSelectedDate(date)}
               disabled={isDisabled}
             >
-              <Text>
+              <Text
+                style={[
+                  theme.styles.components.form.dateSelector.dateText,
+                  {
+                    color: isSelected
+                      ? theme.colors.onPrimary
+                      : isDisabled
+                      ? theme.colors.onSurfaceDisabled
+                      : theme.colors.onSurface,
+                  },
+                  isSelected && theme.styles.components.form.dateSelector.selectedText,
+                  isDisabled && theme.styles.components.form.dateSelector.disabledText,
+                ]}
+              >
                 {formatDateForDisplay(date)}
               </Text>
-              <Text>
+              <Text
+                style={[
+                  theme.styles.components.form.dateSelector.dayText,
+                  {
+                    color: isSelected
+                      ? theme.colors.onPrimary
+                      : isDisabled
+                      ? theme.colors.onSurfaceDisabled
+                      : theme.colors.onSurfaceVariant,
+                  },
+                  isSelected && theme.styles.components.form.dateSelector.selectedText,
+                  isDisabled && theme.styles.components.form.dateSelector.disabledText,
+                ]}
+              >
                 {date.toLocaleDateString('en-US', { weekday: 'short' })}
               </Text>
             </TouchableOpacity>

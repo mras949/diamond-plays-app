@@ -3,8 +3,8 @@ import { Dimensions, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SceneMap, TabView } from 'react-native-tab-view';
 import { GameAccordionProps } from '../../constants/interfaces';
+import { useCustomTheme } from '../../constants/theme';
 import { useGameData } from '../../contexts/GameDataContext';
-import { useAuth } from '../../providers/AuthProvider';
 import { PlayerList } from './PlayerList';
 
 
@@ -12,19 +12,44 @@ import { PlayerList } from './PlayerList';
 
 
 const CustomTabBar = ({ navigationState, jumpTo, position }: any) => {
+    const theme = useCustomTheme();
+
     return (
-        <View>
+        <View style={{ flexDirection: 'row', backgroundColor: 'transparent' }}>
             {navigationState.routes.map((route: any, index: number) => {
                 const isActive = navigationState.index === index;
                 return (
                     <TouchableOpacity
                         key={route.key}
+                        style={[
+                            {
+                                flex: 1,
+                                paddingVertical: theme.styles.spacing.md,
+                                paddingHorizontal: theme.styles.spacing.lg,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: isActive
+                                    ? theme.colors.primary
+                                    : theme.colors.surface,
+                                borderBottomWidth: isActive ? 2 : 0,
+                                borderBottomColor: theme.colors.primary,
+                            },
+                        ]}
                         onPress={() => jumpTo(route.key)}
                     >
-                        <Text>
+                        <Text
+                            style={[
+                                {
+                                    fontSize: 14,
+                                    fontWeight: '600',
+                                    color: isActive
+                                        ? theme.colors.onPrimary
+                                        : theme.colors.onSurface,
+                                },
+                            ]}
+                        >
                             {route.title}
                         </Text>
-                        {isActive && <View />}
                     </TouchableOpacity>
                 );
             })}
@@ -39,7 +64,7 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
     tabIndex,
     onTabChange,
 }) => {
-    const { isAuthenticated } = useAuth();
+    const theme = useCustomTheme();
     const { selectedPlayers, selectPlayer } = useGameData();
 
     // Update selections when onSelectionChange is called
@@ -53,24 +78,24 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
 
     // Memoize tab components to prevent re-renders
     const AwayTab = useCallback(() => (
-        <View>
+        <View style={{ flex: 1, padding: theme.styles.spacing.md }}>
             <PlayerList
                 gameId={game._id}
                 teamId={game.awayTeam._id}
                 onSelectionChange={handleSelectionChange}
             />
         </View>
-    ), [game._id, game.awayTeam._id, handleSelectionChange]);
+    ), [game._id, game.awayTeam._id, handleSelectionChange, theme]);
 
     const HomeTab = useCallback(() => (
-        <View>
+        <View style={{ flex: 1, padding: theme.styles.spacing.md }}>
             <PlayerList
                 gameId={game._id}
                 teamId={game.homeTeam._id}
                 onSelectionChange={handleSelectionChange}
             />
         </View>
-    ), [game._id, game.homeTeam._id, handleSelectionChange]);
+    ), [game._id, game.homeTeam._id, handleSelectionChange, theme]);
 
     // Memoize routes to prevent TabView re-renders
     const routes = useMemo(() => [
@@ -85,56 +110,67 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
     }), [AwayTab, HomeTab]);
 
     return (
-        <View>
+        <View style={theme.styles.components.card}>
             <TouchableOpacity
+                style={[
+                    {
+                        backgroundColor: theme.colors.surfaceVariant,
+                        borderRadius: theme.styles.borderRadius.lg,
+                        borderWidth: 1,
+                        borderColor: theme.colors.outline,
+                        padding: theme.styles.spacing.md,
+                    },
+                ]}
                 onPress={onToggleExpand}
                 activeOpacity={0.7}
             >
-                <View>
-                    <View>
-                        <Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <View style={theme.styles.components.game.teamSection}>
+                        <Text style={theme.styles.components.game.teamCity}>
                             {game.awayTeam.city}
                         </Text>
-                        <Text>
+                        <Text style={theme.styles.components.game.teamName}>
                             {game.awayTeam.teamName}
                         </Text>
                         {selectedPlayers[game.awayTeam._id] ? (
-                            <Text>
+                            <Text style={theme.styles.components.game.playerSelection}>
                                 {selectedPlayers[game.awayTeam._id]?.name ||
                                  selectedPlayers[game.awayTeam._id]?.player?.name ||
                                  'Selected Player'}
                             </Text>
                         ) : (
-                            <Text>
+                            <Text style={theme.styles.components.game.noSelection}>
                                 No Selection
                             </Text>
                         )}
                     </View>
-                    <View>
-                        <Text>
+
+                    <View style={theme.styles.components.game.status}>
+                        <Text style={theme.styles.components.game.statusText}>
                             {game.statusDisplay}
                         </Text>
                         {game.timeDisplay && (
-                            <Text>
+                            <Text style={theme.styles.components.game.timeText}>
                                 {game.timeDisplay}
                             </Text>
                         )}
                     </View>
-                    <View>
-                        <Text>
+
+                    <View style={theme.styles.components.game.teamSection}>
+                        <Text style={theme.styles.components.game.teamCity}>
                             {game.homeTeam.city}
                         </Text>
-                        <Text>
+                        <Text style={theme.styles.components.game.teamName}>
                             {game.homeTeam.teamName}
                         </Text>
                         {selectedPlayers[game.homeTeam._id] ? (
-                            <Text>
+                            <Text style={theme.styles.components.game.playerSelection}>
                                 {selectedPlayers[game.homeTeam._id]?.name ||
                                  selectedPlayers[game.homeTeam._id]?.player?.name ||
                                  'Selected Player'}
                             </Text>
                         ) : (
-                            <Text>
+                            <Text style={theme.styles.components.game.noSelection}>
                                 No Selection
                             </Text>
                         )}
@@ -143,8 +179,14 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
             </TouchableOpacity>
 
             {isExpanded && (
-                <View>
-                    <View>
+                <View style={[{
+                    borderTopWidth: 1,
+                    borderTopColor: theme.colors.outline,
+                    borderBottomLeftRadius: theme.styles.borderRadius.lg,
+                    borderBottomRightRadius: theme.styles.borderRadius.lg,
+                    backgroundColor: theme.colors.surface
+                }]}>
+                    <View style={{ height: 400 }}>
                         <TabView
                             navigationState={{
                                 index: tabIndex,
@@ -161,6 +203,8 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
         </View>
     );
 };
+
+// Styles are now defined in the theme
 
 const GameAccordionMemo = React.memo(GameAccordionComponent);
 export default GameAccordionMemo;

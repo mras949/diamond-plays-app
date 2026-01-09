@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Animated, KeyboardAvoidingView, Modal, PanResponder, Platform, TouchableOpacity, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { API_BASE_URL } from '../../constants/api';
+import { useCustomTheme } from '../../constants/theme';
 import { useAuth } from '../../providers/AuthProvider';
 
 interface RegisterModalProps {
@@ -17,6 +18,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
   onClose,
   onSwitchToLogin,
 }) => {
+  const theme = useCustomTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -193,61 +195,107 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
       transparent={true}
       onRequestClose={onClose}
     >
-      <View>
-        <BlurView intensity={20} />
-        <TouchableOpacity onPress={onClose} />
-        <View>
-          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <Animated.View {...panResponder.panHandlers}>
-              <View>
-                <View />
-              </View>
-              <Text>Create Account</Text>
+      <View style={theme.styles.components.modal.container}>
+        <BlurView intensity={20} style={theme.styles.components.modal.blurView} />
+        <TouchableOpacity style={theme.styles.components.modal.backdrop} onPress={onClose} />
+        <View style={theme.styles.components.modal.wrapper}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={theme.styles.components.modal.keyboardAvoidingView}
+          >
+            <Animated.View
+              style={[
+                theme.styles.components.modal.content,
+                {
+                  backgroundColor: theme.colors.surface,
+                  transform: [
+                    { translateY: Animated.add(modalTranslateY, panY) },
+                  ],
+                },
+              ]}
+              {...panResponder.panHandlers}
+            >
+              <View style={[theme.styles.components.modal.handle, { backgroundColor: theme.colors.onSurfaceDisabled }]} />
+              <Text style={[theme.styles.components.modal.title, { color: theme.colors.onSurface }]}>
+                Create Account
+              </Text>
 
               <TextInput
+                style={theme.styles.components.modal.input}
                 label="Email"
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
                 keyboardType="email-address"
+                mode="outlined"
+                theme={{
+                  colors: {
+                    primary: theme.colors.primary,
+                    background: theme.colors.surface,
+                  },
+                }}
               />
 
               <TextInput
+                style={theme.styles.components.modal.input}
                 label="Password"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
+                mode="outlined"
+                theme={{
+                  colors: {
+                    primary: theme.colors.primary,
+                    background: theme.colors.surface,
+                  },
+                }}
               />
 
               <TextInput
+                style={theme.styles.components.modal.input}
                 label="Confirm Password"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry
+                mode="outlined"
+                theme={{
+                  colors: {
+                    primary: theme.colors.primary,
+                    background: theme.colors.surface,
+                  },
+                }}
               />
 
               {password && confirmPassword && password === confirmPassword ? (
-                <Text>✓ Passwords match</Text>
+                <Text style={[theme.styles.components.modal.successText, { color: theme.colors.primary }]}>
+                  ✓ Passwords match
+                </Text>
               ) : null}
 
               {error ? (
-                <Text>
+                <Text style={[theme.styles.components.modal.errorText, { color: theme.colors.error }]}>
                   {error}
                 </Text>
               ) : null}
 
               <Button
+                style={theme.styles.components.modal.button}
                 mode="contained"
                 onPress={handleRegister}
                 loading={loading}
                 disabled={loading}
+                buttonColor={theme.colors.primary}
+                textColor={theme.colors.onPrimary}
               >
                 {loading ? 'Creating Account...' : 'Sign Up'}
               </Button>
 
-              <TouchableOpacity onPress={onSwitchToLogin}>
-                <Text>
-                  Already have an account? <Text>Log in</Text>
+              <TouchableOpacity style={theme.styles.components.modal.switchContainer} onPress={onSwitchToLogin}>
+                <Text style={[theme.styles.components.modal.switchText, { color: theme.colors.onSurfaceVariant }]}>
+                  Already have an account?{' '}
+                  <Text style={[theme.styles.components.modal.switchLink, { color: theme.colors.primary }]}>
+                    Log in
+                  </Text>
                 </Text>
               </TouchableOpacity>
             </Animated.View>
@@ -257,3 +305,5 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
     </Modal>
   );
 };
+
+export default RegisterModal;

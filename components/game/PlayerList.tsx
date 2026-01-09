@@ -1,8 +1,8 @@
-import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { GamePlayer, PlayerListProps } from '../../constants/interfaces';
+import { useCustomTheme } from '../../constants/theme';
 import { useGameData } from '../../contexts/GameDataContext';
 import { useAuth } from '../../providers/AuthProvider';
 
@@ -11,7 +11,7 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
     teamId,
     onSelectionChange,
 }) => {
-    const router = useRouter();
+    const theme = useCustomTheme();
     const { isAuthenticated } = useAuth();
     const { players, playerLoading, selectedPlayers, fetchPlayers, selectPlayer, playerFetchAttempts, resetPlayerFetchAttempt } = useGameData();
     const [savingSelection, setSavingSelection] = useState(false);
@@ -56,7 +56,7 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
                     playerId: gamePlayerId,
                 });
             }
-        } catch (error) {
+        } catch (error) { // eslint-disable-line @typescript-eslint/no-unused-vars
         } finally {
             setSavingSelection(false);
         }
@@ -83,29 +83,48 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
 
         return (
             <TouchableOpacity
+                style={[
+                    theme.styles.components.player.playerRow,
+                    {
+                        backgroundColor: isSelected
+                            ? theme.colors.primaryContainer
+                            : theme.colors.surface,
+                        borderColor: isSelected
+                            ? theme.colors.primary
+                            : theme.colors.outline,
+                    },
+                ]}
                 onPress={() => handlePlayerSelect(item)}
                 disabled={savingSelection}
+                activeOpacity={0.7}
             >
-                <View>
-                    <Text>
-                        {item.battingOrder}
-                    </Text>
-                    <Text>
-                        {getPlayerName(item)}
-                    </Text>
+                <View style={theme.styles.components.player.playerInfo}>
+                    <View style={[theme.styles.components.player.battingOrderContainer, { backgroundColor: theme.colors.surfaceVariant }]}>
+                        <Text style={[theme.styles.components.player.battingOrder, { color: theme.colors.onSurfaceVariant }]}>
+                            {item.battingOrder}
+                        </Text>
+                    </View>
+                    <View style={theme.styles.components.player.playerDetails}>
+                        <Text style={[theme.styles.components.player.playerName, { color: theme.colors.onSurface }]}>
+                            {getPlayerName(item)}
+                        </Text>
+                        <Text style={[theme.styles.components.player.playerPosition, { color: theme.colors.onSurfaceVariant }]}>
+                            {getPlayerPosition(item)}
+                        </Text>
+                    </View>
                     {isSelected && (
-                        <View>
-                            <Text>✓</Text>
+                        <View style={[theme.styles.components.player.selectionIndicator, { backgroundColor: theme.colors.primary }]}>
+                            <Text style={[theme.styles.components.player.checkmark, { color: theme.colors.onPrimary }]}>
+                                ✓
+                            </Text>
                         </View>
                     )}
                 </View>
-                <Text>
-                    {getPlayerPosition(item)}
-                </Text>
                 {isSaving && (
                     <ActivityIndicator
                         size="small"
-                        color="#3b82f6"
+                        color={theme.colors.primary}
+                        style={theme.styles.components.player.loadingIndicator}
                     />
                 )}
             </TouchableOpacity>
@@ -114,15 +133,20 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
 
     if (fetchError) {
         return (
-            <View>
-                <Text>{fetchError}</Text>
+            <View style={[theme.styles.components.player.centerContainer, { backgroundColor: theme.colors.surface }]}>
+                <Text style={[theme.styles.components.player.errorText, { color: theme.colors.error }]}>
+                    {fetchError}
+                </Text>
                 <TouchableOpacity
+                    style={[theme.styles.components.player.retryButton, { backgroundColor: theme.colors.primary }]}
                     onPress={() => {
                         resetPlayerFetchAttempt(gameId, teamId);
                         setFetchError(null);
                     }}
                 >
-                    <Text>Retry</Text>
+                    <Text style={[theme.styles.components.player.retryText, { color: theme.colors.onPrimary }]}>
+                        Retry
+                    </Text>
                 </TouchableOpacity>
             </View>
         );
@@ -130,26 +154,30 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
 
     if (shouldShowLoading) {
         return (
-            <View>
-                <ActivityIndicator size="large" color="#3b82f6" />
+            <View style={[theme.styles.components.player.centerContainer, { backgroundColor: theme.colors.surface }]}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
             </View>
         );
     }
 
     if (currentPlayers.length === 0) {
         return (
-            <View>
-                <Text>Lineup not set</Text>
+            <View style={[theme.styles.components.player.centerContainer, { backgroundColor: theme.colors.surface }]}>
+                <Text style={[theme.styles.components.player.emptyText, { color: theme.colors.onSurfaceVariant }]}>
+                    Lineup not set
+                </Text>
             </View>
         );
     }
 
     return (
         <FlatList
+            style={[theme.styles.components.player.listContainer, { backgroundColor: theme.colors.surface }]}
             data={[...currentPlayers].sort((a, b) => a.battingOrder - b.battingOrder)}
             renderItem={renderPlayerRow}
             keyExtractor={(item) => item._id}
             scrollEnabled={false}
+            ItemSeparatorComponent={() => <View style={[theme.styles.components.player.separator, { backgroundColor: theme.colors.outline }]} />}
         />
     );
 });
