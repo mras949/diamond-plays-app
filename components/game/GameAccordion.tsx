@@ -9,31 +9,7 @@ import { PlayerList } from './PlayerList';
 
 
 
-// Helper function to format game time/inning display
-const getGameTimeDisplay = (game: any): string => {
-    if (game.status === 'completed') {
-        return ''; // No time for completed games
-    }
-    
-    if (game.status === 'in_progress') {
-        // Combine inning state and inning ordinal for live games
-        if (game.inningState && game.inningOrdinal) {
-            return `${game.inningState} ${game.inningOrdinal}`;
-        } else if (game.inningOrdinal) {
-            return game.inningOrdinal;
-        }
-    }
-    
-    // For scheduled games, show the time
-    if (game.dateTime) {
-        return new Date(game.dateTime).toLocaleTimeString([], { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-    }
-    
-    return '';
-};
+
 
 const CustomTabBar = ({ navigationState, jumpTo, position }: any) => {
     return (
@@ -138,9 +114,9 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
                         <Text>
                             {game.statusDisplay}
                         </Text>
-                        {getGameTimeDisplay(game) && (
+                        {game.timeDisplay && (
                             <Text>
-                                {getGameTimeDisplay(game)}
+                                {game.timeDisplay}
                             </Text>
                         )}
                     </View>
