@@ -23,7 +23,12 @@ function AuthenticationGuard() {
 
   if (loading || logoutLoading) {
     return (
-      <View>
+      <View style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'transparent'
+      }}>
         <ActivityIndicator size="large" color="#3b82f6" />
       </View>
     );
@@ -31,9 +36,13 @@ function AuthenticationGuard() {
 
   // Show appropriate stack based on auth state
   if (!isAuthenticated) {
-    return <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-    </Stack>
+    return (
+      <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }}>
+          <Stack.Screen name="index" options={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }} />
+        </Stack>
+      </View>
+    );
   }
 
   // User is authenticated

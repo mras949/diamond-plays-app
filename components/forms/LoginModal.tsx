@@ -6,21 +6,20 @@ import { API_BASE_URL } from '../../constants/api';
 import { useCustomTheme } from '../../constants/theme';
 import { useAuth } from '../../providers/AuthProvider';
 
-interface RegisterModalProps {
+interface LoginModalProps {
   visible: boolean;
   onClose: () => void;
-  onSwitchToLogin: () => void;
+  onSwitchToRegister: () => void;
 }
 
-export const RegisterModal: React.FC<RegisterModalProps> = ({
+export const LoginModal: React.FC<LoginModalProps> = ({
   visible,
   onClose,
-  onSwitchToLogin,
+  onSwitchToRegister,
 }) => {
   const theme = useCustomTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -48,28 +47,27 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
         Animated.spring(handleScale, {
           toValue: 1.2,
           useNativeDriver: true,
-          tension: 200,
-          friction: 5,
+          tension: 100,
+          friction: 8,
         }).start();
       },
       onPanResponderMove: (evt, gestureState) => {
-        if (gestureState.dy > 0) { // Only allow downward movement
+        if (gestureState.dy > 0) {
+          // Only allow downward swipes
           panY.setValue(gestureState.dy);
         }
       },
       onPanResponderRelease: (evt, gestureState) => {
-        const { dy, vy } = gestureState;
-
-        // Reset handle scale
         Animated.spring(handleScale, {
           toValue: 1,
           useNativeDriver: true,
-          tension: 200,
-          friction: 5,
+          tension: 100,
+          friction: 8,
         }).start();
 
-        // If swiped down with enough velocity or distance, dismiss modal
-        if (dy > 100 || vy > 0.5) {
+        // Check if swipe was sufficient to close modal
+        if (gestureState.dy > 100) { // Increased threshold for closing
+          // Animate modal out
           Animated.parallel([
             Animated.timing(backdropOpacity, {
               toValue: 0,
@@ -130,48 +128,9 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
     }
   }, [visible, backdropOpacity, modalTranslateY, handleScale, panY]);
 
-  // Real-time password validation
-  useEffect(() => {
-    if (confirmPassword && password !== confirmPassword) {
-      setError('Passwords do not match');
-    } else if (confirmPassword && password === confirmPassword) {
-      setError(''); // Clear error when passwords match
-    }
-  }, [password, confirmPassword]);
-
-  const handleRegister = async () => {
-    if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
-      setError('Please fill in all fields');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    // Clear any validation errors since we're proceeding
-    setError('');
-
-    try {
-      setLoading(true);
-      const response = await axios.post(`${API_BASE_URL}/auth/register`, {
-        email: email.trim(),
-        password
-      });
-      await login(response.data.token);
-      onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Try a different email.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleClose = () => {
     setEmail('');
     setPassword('');
-    setConfirmPassword('');
     setError('');
     setLoading(false);
     // Reset animations
@@ -180,14 +139,22 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
     onClose();
   };
 
-
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
+      await login(response.data.token);
+      handleClose();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Login failed. Check your credentials.');
+    }
+  };
 
   return (
     <Modal
       visible={visible}
       animationType="slide"
       transparent={true}
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
       <View style={theme.styles.components.modal.container}>
         <View pointerEvents="box-none" style={theme.styles.components.modal.backdrop}>
@@ -196,7 +163,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               theme.styles.components.modal.backdrop,
               { opacity: backdropOpacity, backgroundColor: 'rgba(0, 0, 0, 0.5)' },
             ]}
-            onPress={onClose}
+            onPress={handleClose}
             activeOpacity={1}
           />
         </View>
@@ -219,7 +186,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
             >
               <View style={[theme.styles.components.modal.handle, { backgroundColor: theme.colors.onSurfaceDisabled }]} />
               <Text style={[theme.styles.components.modal.title, { color: theme.colors.onSurface }]}>
-                Create Account
+                Login
               </Text>
 
               <TextInput
@@ -253,27 +220,6 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 }}
               />
 
-              <TextInput
-                style={theme.styles.components.modal.input}
-                label="Confirm Password"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-                mode="outlined"
-                theme={{
-                  colors: {
-                    primary: theme.colors.primary,
-                    background: theme.colors.surface,
-                  },
-                }}
-              />
-
-              {password && confirmPassword && password === confirmPassword ? (
-                <Text style={[theme.styles.components.modal.successText, { color: theme.colors.primary }]}>
-                  ✓ Passwords match
-                </Text>
-              ) : null}
-
               {error ? (
                 <Text style={[theme.styles.components.modal.errorText, { color: theme.colors.error }]}>
                   {error}
@@ -283,20 +229,20 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               <Button
                 style={theme.styles.components.modal.button}
                 mode="contained"
-                onPress={handleRegister}
+                onPress={handleLogin}
                 loading={loading}
                 disabled={loading}
                 buttonColor={theme.colors.primary}
                 textColor={theme.colors.onPrimary}
               >
-                {loading ? 'Creating Account...' : 'Sign Up'}
+                {loading ? 'Logging in...' : 'Login'}
               </Button>
 
-              <TouchableOpacity style={theme.styles.components.modal.switchContainer} onPress={onSwitchToLogin}>
+              <TouchableOpacity style={theme.styles.components.modal.switchContainer} onPress={onSwitchToRegister}>
                 <Text style={[theme.styles.components.modal.switchText, { color: theme.colors.onSurfaceVariant }]}>
-                  Already have an account?{' '}
+                  Don&apos;t have an account?{' '}
                   <Text style={[theme.styles.components.modal.switchLink, { color: theme.colors.primary }]}>
-                    Log in
+                    Sign up
                   </Text>
                 </Text>
               </TouchableOpacity>
@@ -308,4 +254,4 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
   );
 };
 
-export default RegisterModal;
+export default LoginModal;

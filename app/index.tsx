@@ -2,8 +2,9 @@ import axios from 'axios';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
-import { Button, TextInput } from 'react-native-paper';
+import { Image, Text, View } from 'react-native';
+import { Button } from 'react-native-paper';
+import { LoginModal } from '../components/forms/LoginModal';
 import { RegisterModal } from '../components/forms/RegisterModal';
 import { API_BASE_URL } from '../constants/api';
 import { useCustomTheme } from '../constants/theme';
@@ -12,9 +13,7 @@ import { useAuth } from '../providers/AuthProvider';
 WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [registerModalVisible, setRegisterModalVisible] = useState(false);
   const { login } = useAuth();
   const theme = useCustomTheme();
@@ -29,9 +28,9 @@ const LoginScreen: React.FC = () => {
       const response = await axios.post(`${API_BASE_URL}/auth/login/google`, { idToken });
       await login(response.data.token);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Google login failed.');
+      console.error('Google login failed:', err.response?.data?.message || 'Google login failed.');
     }
-  }, [login]);
+  }, []);
 
   useEffect(() => {
     if (response?.type === 'success') {
@@ -42,70 +41,42 @@ const LoginScreen: React.FC = () => {
     }
   }, [response, handleGoogleLogin]);
 
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
-      await login(response.data.token);
-      // Navigation will be handled by AuthenticationGuard in _layout.tsx
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Check your credentials.');
-    }
-  };
-
   return (
     <>
-      <View style={theme.styles.components.form.container}>
+      <Image
+        source={require('../assets/splash-bg.png')}
+        style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+        }}
+        resizeMode="cover"
+      />
+      <View style={[theme.styles.components.form.container, { backgroundColor: 'transparent' }]}>
         <View style={theme.styles.components.form.header}>
-          <Text style={[theme.styles.components.text.title, { color: theme.colors.primary }]}>
-            Diamond Plays
+          <Image
+            source={require('../assets/diamond-plays-logo-1024.png')}
+            style={{
+              width: 75,
+              height: 75,
+              marginBottom: 16,
+              alignSelf: 'center',
+            }}
+            resizeMode="contain"
+          />
+          <Text style={theme.styles.components.text.logothin}>
+            Diamond <Text style={theme.styles.components.text.logo}>Plays</Text>
           </Text>
         </View>
 
         <View style={theme.styles.components.form.content}>
-          <TextInput
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            mode="outlined"
-            style={theme.styles.components.input}
-            theme={{
-              colors: {
-                background: theme.colors.surface,
-                onSurface: theme.colors.onSurface,
-              }
-            }}
-          />
-
-          <TextInput
-            label="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            mode="outlined"
-            style={theme.styles.components.input}
-            theme={{
-              colors: {
-                background: theme.colors.surface,
-                onSurface: theme.colors.onSurface,
-              }
-            }}
-          />
-
-          {error ? (
-            <Text style={theme.styles.components.text.error}>
-              {error}
-            </Text>
-          ) : null}
-
           <Button
             mode="contained"
-            onPress={handleLogin}
+            onPress={() => setLoginModalVisible(true)}
             style={theme.styles.components.button}
             contentStyle={{ paddingVertical: 8 }}
           >
-            Login
+            Login with Email
           </Button>
 
           <Button
@@ -131,6 +102,15 @@ const LoginScreen: React.FC = () => {
         visible={registerModalVisible}
         onClose={() => setRegisterModalVisible(false)}
         onSwitchToLogin={() => setRegisterModalVisible(false)}
+      />
+
+      <LoginModal
+        visible={loginModalVisible}
+        onClose={() => setLoginModalVisible(false)}
+        onSwitchToRegister={() => {
+          setLoginModalVisible(false);
+          setRegisterModalVisible(true);
+        }}
       />
     </>
   );

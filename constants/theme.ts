@@ -41,7 +41,7 @@ const DarkTheme = {
     onErrorContainer: '#fecaca',
 
     // Background colors
-    background: '#0f172a', // Very dark blue-gray
+    background: '#0a0f1c', // Very dark blue-gray
     onBackground: '#f8fafc', // Light text on dark background
     surface: '#1e293b', // Dark blue-gray surface
     onSurface: '#f1f5f9', // Light text on surface
@@ -232,6 +232,24 @@ const ThemeStyles = {
       title: {
         fontSize: 32,
         fontWeight: 'bold' as const,
+        textAlign: 'center' as const,
+        color: DarkTheme.colors.onSurface,
+      },
+      titlethin: {
+        fontSize: 32,
+        fontWeight: '100' as const,
+        textAlign: 'center' as const,
+        color: DarkTheme.colors.onSurface,
+      },
+      logo: {
+        fontSize: 28,
+        fontWeight: 'bold' as const,
+        textAlign: 'center' as const,
+        color: DarkTheme.colors.onSurface,
+      },
+      logothin: {
+        fontSize: 28,
+        fontWeight: '100' as const,
         textAlign: 'center' as const,
         color: DarkTheme.colors.onSurface,
       },
@@ -532,18 +550,26 @@ const ThemeStyles = {
         justifyContent: 'flex-end' as const,
       },
       wrapper: {
+        position: 'absolute' as const,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         justifyContent: 'flex-end' as const,
+        zIndex: 10,
       },
       content: {
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         padding: 24,
         paddingBottom: 40,
+        minHeight: 300,
         elevation: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.1,
         shadowRadius: 8,
+        zIndex: 2,
       },
       handle: {
         width: 40,
@@ -558,6 +584,10 @@ const ThemeStyles = {
       },
       backdrop: {
         ...StyleSheet.absoluteFillObject,
+      },
+      backdropTouchable: {
+        ...StyleSheet.absoluteFillObject,
+        zIndex: 1,
       },
       keyboardAvoidingView: {
         flex: 1,
