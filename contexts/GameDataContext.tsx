@@ -1,9 +1,9 @@
 import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { API_BASE_URL } from '../constants/api';
 import { Game, GamePlayer } from '../constants/interfaces';
 import { useAuth } from '../providers/AuthProvider';
+import { storageService } from '../utils/storage';
 
 interface GameDataContextType {
   // State
@@ -96,7 +96,7 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
         setError(null);
       }
 
-      const token = await SecureStore.getItemAsync('jwtToken');
+      const token = await storageService.getItem('jwtToken');
       if (!token) {
         if (showLoading) {
           setLoading(false);
@@ -163,7 +163,7 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
     setPlayerLoading(prev => ({ ...prev, [key]: true }));
 
     try {
-      const token = await SecureStore.getItemAsync('jwtToken');
+      const token = await storageService.getItem('jwtToken');
       if (!token) {
         return;
       }
@@ -199,7 +199,7 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
     refs.current.selectionAbortController = new AbortController();
 
     try {
-      const token = await SecureStore.getItemAsync('jwtToken');
+      const token = await storageService.getItem('jwtToken');
       if (!token) return;
 
       // Find the gamePlayer in cached data to get game and team IDs
@@ -302,7 +302,7 @@ export const GameDataProvider: React.FC<GameDataProviderProps> = ({ children }) 
     refs.current.selectionsAbortController = new AbortController();
 
     try {
-      const token = await SecureStore.getItemAsync('jwtToken');
+      const token = await storageService.getItem('jwtToken');
       if (!token) return;
 
       const headers = { Authorization: `Bearer ${token}` };

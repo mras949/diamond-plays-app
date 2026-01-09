@@ -1,5 +1,5 @@
-import * as SecureStore from 'expo-secure-store';
 import React, { useContext, useEffect, useState } from 'react';
+import { storageService } from '../utils/storage';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -20,7 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Handle auth state
   const login = React.useCallback(async (token: string) => {
     try {
-      await SecureStore.setItemAsync('jwtToken', token);
+      await storageService.setItem('jwtToken', token);
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Login error:', error);
@@ -30,10 +30,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = React.useCallback(async () => {
     if (logoutLoading) return; // Prevent multiple logout calls
-    
+
     try {
       setLogoutLoading(true);
-      await SecureStore.deleteItemAsync('jwtToken');
+      await storageService.deleteItem('jwtToken');
       setIsAuthenticated(false);
     } catch (error) {
       console.error('Logout error:', error);
@@ -48,9 +48,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const checkAuth = async () => {
       if (!mounted) return;
-      
+
       try {
-        const token = await SecureStore.getItemAsync('jwtToken');
+        const token = await storageService.getItem('jwtToken');
         if (mounted) {
           setIsAuthenticated(!!token);
           setHasChecked(true);
