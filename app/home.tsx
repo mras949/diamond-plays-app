@@ -47,7 +47,7 @@ const HomeScreen = () => {
     };
 
     return (
-        <View className="flex-1 bg-background">
+        <View>
             <Appbar.Header>
                 <Appbar.Action
                     icon="menu"
@@ -63,13 +63,13 @@ const HomeScreen = () => {
                 logoutLoading={logoutLoading}
             />
             {loading && (
-                <View className="absolute inset-0 bg-background bg-opacity-75 justify-center items-center">
-                    <Text className="text-text">Loading...</Text>
+                <View>
+                    <Text>Loading...</Text>
                 </View>
             )}
             {error && (
-                <View className="absolute bottom-0 left-0 right-0 bg-error p-4">
-                    <Text className="text-white text-center">{error}</Text>
+                <View>
+                    <Text>{error}</Text>
                 </View>
             )}
         </View>

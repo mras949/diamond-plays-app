@@ -33,8 +33,6 @@ const GameList: React.FC = () => {
 
   return (
     <ScrollView
-      className="flex-1"
-      contentContainerStyle={{ flexGrow: 1 }}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
@@ -42,7 +40,7 @@ const GameList: React.FC = () => {
         />
       }
     >
-      <View className="p-md">
+      <View>
         {games.length > 0 ? (
           games.map((game) => (
             <GameAccordion
@@ -55,7 +53,7 @@ const GameList: React.FC = () => {
             />
           ))
         ) : (
-          <Text className="text-body-md text-secondary text-center py-lg">No games available for this date</Text>
+          <Text>No games available for this date</Text>
         )}
       </View>
     </ScrollView>

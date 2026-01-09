@@ -24,27 +24,25 @@ const RegisterScreen: React.FC = () => {
   };
 
   return (
-    <View className="flex-1 justify-center px-6 bg-background">
-      <Text className="text-3xl font-bold text-text text-center mb-8">Sign Up</Text>
+    <View>
+      <Text>Sign Up</Text>
       <TextInput
         label="Email"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
-        className="mb-4"
       />
       <TextInput
         label="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        className="mb-4"
       />
-      {error ? <Text className="text-error text-sm mb-4">{error}</Text> : null}
-      <Button mode="contained" onPress={handleRegister} className="mb-4">
+      {error ? <Text>{error}</Text> : null}
+      <Button mode="contained" onPress={handleRegister}>
         Register
       </Button>
-      <Text className="text-primary text-center font-semibold" onPress={() => router.push('/')}>
+      <Text onPress={() => router.push('/')}>
         Already have an account? Log in
       </Text>
     </View>

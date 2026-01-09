@@ -23,7 +23,7 @@ function AuthenticationGuard() {
 
   if (loading || logoutLoading) {
     return (
-      <View className="flex-1 justify-center items-center bg-background">
+      <View>
         <ActivityIndicator size="large" color="#3b82f6" />
       </View>
     );

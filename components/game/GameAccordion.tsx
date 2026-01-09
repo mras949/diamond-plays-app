@@ -55,23 +55,18 @@ const getGameTimeDisplay = (game: any): string => {
 
 const CustomTabBar = ({ navigationState, jumpTo, position }: any) => {
     return (
-        <View className="flex-row h-12 bg-surface border-b border-outline">
+        <View>
             {navigationState.routes.map((route: any, index: number) => {
                 const isActive = navigationState.index === index;
                 return (
                     <TouchableOpacity
                         key={route.key}
-                        className="flex-1 items-center justify-center py-3 px-0 relative min-h-9"
                         onPress={() => jumpTo(route.key)}
                     >
-                        <Text
-                            className={`text-xs font-medium capitalize text-center ${
-                                isActive ? 'text-primary' : 'text-secondary'
-                            }`}
-                        >
+                        <Text>
                             {route.title}
                         </Text>
-                        {isActive && <View className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+                        {isActive && <View />}
                     </TouchableOpacity>
                 );
             })}
@@ -100,7 +95,7 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
 
     // Memoize tab components to prevent re-renders
     const AwayTab = useCallback(() => (
-        <View className="flex-1 p-0 bg-background">
+        <View>
             <PlayerList
                 gameId={game._id}
                 teamId={game.awayTeam._id}
@@ -110,7 +105,7 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
     ), [game._id, game.awayTeam._id, handleSelectionChange]);
 
     const HomeTab = useCallback(() => (
-        <View className="flex-1 p-0 bg-background">
+        <View>
             <PlayerList
                 gameId={game._id}
                 teamId={game.homeTeam._id}
@@ -132,57 +127,56 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
     }), [AwayTab, HomeTab]);
 
     return (
-        <View className="my-1 bg-surface rounded-md overflow-hidden">
+        <View>
             <TouchableOpacity
-                className="py-2.5 px-5 bg-surface"
                 onPress={onToggleExpand}
                 activeOpacity={0.7}
             >
-                <View className="flex-row items-center justify-center gap-4">
-                    <View className="w-10/12 items-end">
-                        <Text className="text-xs font-light text-on-surface text-center leading-4 tracking-tight">
+                <View>
+                    <View>
+                        <Text>
                             {game.awayTeam.city}
                         </Text>
-                        <Text className="text-sm font-black text-on-surface text-center leading-4 tracking-tight">
+                        <Text>
                             {game.awayTeam.teamName}
                         </Text>
                         {selectedPlayers[game.awayTeam._id] ? (
-                            <Text className="text-xs font-normal text-primary text-center tracking-tight">
+                            <Text>
                                 {selectedPlayers[game.awayTeam._id]?.name ||
                                  selectedPlayers[game.awayTeam._id]?.player?.name ||
                                  'Selected Player'}
                             </Text>
                         ) : (
-                            <Text className="text-xs font-normal text-secondary text-center tracking-tight">
+                            <Text>
                                 No Selection
                             </Text>
                         )}
                     </View>
-                    <View className="w-2/12 items-center gap-0.5">
-                        <Text className="text-xs font-medium text-on-surface capitalize text-center p-0 m-0 leading-3 tracking-tight">
+                    <View>
+                        <Text>
                             {getGameStatusDisplay(game)}
                         </Text>
                         {getGameTimeDisplay(game) && (
-                            <Text className="text-sm font-black text-on-surface-variant text-center p-0 m-0 leading-3 tracking-tight">
+                            <Text>
                                 {getGameTimeDisplay(game)}
                             </Text>
                         )}
                     </View>
-                    <View className="w-10/12 items-start">
-                        <Text className="text-xs font-light text-on-surface text-center leading-4 tracking-tight">
+                    <View>
+                        <Text>
                             {game.homeTeam.city}
                         </Text>
-                        <Text className="text-sm font-black text-on-surface text-center leading-4 tracking-tight">
+                        <Text>
                             {game.homeTeam.teamName}
                         </Text>
                         {selectedPlayers[game.homeTeam._id] ? (
-                            <Text className="text-xs font-normal text-primary text-center tracking-tight">
+                            <Text>
                                 {selectedPlayers[game.homeTeam._id]?.name ||
                                  selectedPlayers[game.homeTeam._id]?.player?.name ||
                                  'Selected Player'}
                             </Text>
                         ) : (
-                            <Text className="text-xs font-normal text-secondary text-center tracking-tight">
+                            <Text>
                                 No Selection
                             </Text>
                         )}
@@ -191,8 +185,8 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
             </TouchableOpacity>
 
             {isExpanded && (
-                <View className="p-0">
-                    <View className="h-80 mt-2 bg-surface">
+                <View>
+                    <View>
                         <TabView
                             navigationState={{
                                 index: tabIndex,
@@ -202,7 +196,6 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
                             onIndexChange={onTabChange}
                             initialLayout={{ width: Dimensions.get('window').width }}
                             renderTabBar={CustomTabBar}
-                            className="flex-1"
                         />
                     </View>
                 </View>

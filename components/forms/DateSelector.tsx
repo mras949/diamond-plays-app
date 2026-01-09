@@ -81,39 +81,26 @@ const DateSelector: React.FC = () => {
   }, [dateList, selectedDate]);
 
   return (
-    <View className="py-1 px-4 bg-surface">
+    <View>
       <ScrollView
         ref={dateScrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
-        className="h-10"
-        contentContainerStyle={{ paddingHorizontal: 8, alignItems: 'center' }}
       >
         {dateList.map((date, index) => {
           const isSelected = date.toDateString() === selectedDate.toDateString();
           const isDisabled = !isDateSelectable(date);
-          
+
           return (
             <TouchableOpacity
               key={index}
-              className={`w-18 h-10 mx-1 items-center justify-center ${
-                isDisabled ? 'opacity-50' : ''
-              }`}
               onPress={() => !isDisabled && setSelectedDate(date)}
               disabled={isDisabled}
             >
-              <Text
-                className={`text-xs font-semibold text-center leading-2.5 ${
-                  isSelected ? 'text-primary' : 'text-onSurfaceVariant'
-                } ${isDisabled ? 'opacity-50' : ''}`}
-              >
+              <Text>
                 {formatDateForDisplay(date)}
               </Text>
-              <Text
-                className={`text-xs text-center mt-0.5 leading-2.5 ${
-                  isSelected ? 'text-primary opacity-90' : 'text-onSurfaceVariant opacity-70'
-                } ${isDisabled ? 'opacity-50' : ''}`}
-              >
+              <Text>
                 {date.toLocaleDateString('en-US', { weekday: 'short' })}
               </Text>
             </TouchableOpacity>

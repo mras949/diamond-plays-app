@@ -83,39 +83,29 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
 
         return (
             <TouchableOpacity
-                className={`flex-row justify-between items-center py-2 px-2 border-b border-outline bg-background ${
-                    isSelected ? 'bg-selected' : ''
-                } ${isSaving ? 'opacity-70' : ''}`}
                 onPress={() => handlePlayerSelect(item)}
                 disabled={savingSelection}
             >
-                <View className="flex-row items-center flex-1">
-                    <Text className={`w-8 text-center font-regular text-xs ${
-                        isSelected ? 'text-primary font-semibold' : 'text-secondary'
-                    }`}>
+                <View>
+                    <Text>
                         {item.battingOrder}
                     </Text>
-                    <Text className={`flex-1 ml-2 font-regular text-xs ${
-                        isSelected ? 'text-primary font-semibold' : 'text-text'
-                    }`}>
+                    <Text>
                         {getPlayerName(item)}
                     </Text>
                     {isSelected && (
-                        <View className="ml-2 w-5 h-5 rounded-full bg-primary items-center justify-center">
-                            <Text className="text-white text-xs font-bold">✓</Text>
+                        <View>
+                            <Text>✓</Text>
                         </View>
                     )}
                 </View>
-                <Text className={`w-12 text-right font-regular text-xs ${
-                    isSelected ? 'text-primary font-semibold' : 'text-secondary'
-                }`}>
+                <Text>
                     {getPlayerPosition(item)}
                 </Text>
                 {isSaving && (
                     <ActivityIndicator
                         size="small"
                         color="#3b82f6"
-                        className="absolute right-2"
                     />
                 )}
             </TouchableOpacity>
@@ -124,16 +114,15 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
 
     if (fetchError) {
         return (
-            <View className="flex-1 justify-center items-center p-4">
-                <Text className="text-error text-center mb-4">{fetchError}</Text>
+            <View>
+                <Text>{fetchError}</Text>
                 <TouchableOpacity
-                    className="bg-primary px-4 py-2 rounded-md"
                     onPress={() => {
                         resetPlayerFetchAttempt(gameId, teamId);
                         setFetchError(null);
                     }}
                 >
-                    <Text className="text-white font-semibold">Retry</Text>
+                    <Text>Retry</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -141,7 +130,7 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
 
     if (shouldShowLoading) {
         return (
-            <View className="flex-1 justify-center items-center">
+            <View>
                 <ActivityIndicator size="large" color="#3b82f6" />
             </View>
         );
@@ -149,8 +138,8 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
 
     if (currentPlayers.length === 0) {
         return (
-            <View className="flex-1 justify-center items-center p-4">
-                <Text className="text-secondary text-center">Lineup not set</Text>
+            <View>
+                <Text>Lineup not set</Text>
             </View>
         );
     }
@@ -161,7 +150,6 @@ export const PlayerList: React.FC<PlayerListProps> = React.memo(({
             renderItem={renderPlayerRow}
             keyExtractor={(item) => item._id}
             scrollEnabled={false}
-            className="flex-1"
         />
     );
 });

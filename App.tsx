@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import './global.css';
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -20,7 +19,7 @@ export default function App() {
 
   if (!fontsLoaded) {
     return (
-      <View className="flex-1 justify-center items-center bg-background">
+      <View>
         <ActivityIndicator size="large" color="#3b82f6" />
       </View>
     );

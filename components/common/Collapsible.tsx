@@ -11,7 +11,6 @@ export function Collapsible({ children, title }: PropsWithChildren & { title: st
   return (
     <ThemedView>
       <TouchableOpacity
-        className="flex-row items-center py-2"
         onPress={() => setIsOpen(!isOpen)}
         accessibilityRole="button">
         <IconSymbol
@@ -23,7 +22,7 @@ export function Collapsible({ children, title }: PropsWithChildren & { title: st
         <ThemedText type="link">{title}</ThemedText>
       </TouchableOpacity>
       {isOpen && (
-        <ThemedView className="ml-6">
+        <ThemedView>
           {children}
         </ThemedView>
       )}

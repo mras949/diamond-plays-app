@@ -3,8 +3,8 @@ import * as Google from 'expo-auth-session/providers/google';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { Button, Text, TextInput } from 'react-native-paper';
+import { Text, View } from 'react-native';
+import { Button, TextInput } from 'react-native-paper';
 import { RegisterModal } from '../components/forms/RegisterModal';
 import { API_BASE_URL } from '../constants/api';
 import { useAuth } from '../providers/AuthProvider';
@@ -54,31 +54,37 @@ const LoginScreen: React.FC = () => {
 
   return (
     <>
-      <View className="flex-1 justify-center px-6 bg-background">
-        <Text className="text-3xl font-bold text-text text-center mb-8">Diamond Plays</Text>
-        <TextInput
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          className="mb-4"
-        />
-        <TextInput
-          label="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          className="mb-4"
-        />
-        {error ? <Text className="text-error text-sm mb-4">{error}</Text> : null}
-        <Button mode="contained" onPress={handleLogin} className="mb-4">
-          Login
-        </Button>
-        <Button mode="outlined" onPress={() => promptAsync()} className="mb-4">
-          Login with Google
-        </Button>
-        <Text className="text-primary text-center font-semibold" onPress={() => setRegisterModalVisible(true)}>
-          Don’t have an account? Sign up
+      <View>
+        <Text>Diamond Plays</Text>
+        <View>
+          <TextInput
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+          />
+        </View>
+        <View>
+          <TextInput
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+        </View>
+        {error ? <Text>{error}</Text> : null}
+        <View>
+          <Button mode="contained" onPress={handleLogin}>
+            Login
+          </Button>
+        </View>
+        <View>
+          <Button mode="outlined" onPress={() => promptAsync()}>
+            Login with Google
+          </Button>
+        </View>
+        <Text onPress={() => setRegisterModalVisible(true)}>
+          Don't have an account? Sign up
         </Text>
       </View>
       <RegisterModal
