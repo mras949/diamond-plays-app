@@ -56,6 +56,7 @@ export interface Game {
   homeScore: number;
   awayScore: number;
   status: 'scheduled' | 'in_progress' | 'completed' | 'postponed' | 'delayed' | 'suspended';
+  statusDisplay: string; // Display-friendly status text (e.g., 'Live', 'Final', etc.)
   inningOrdinal?: string;
   inningState?: string;
   winner?: string; // Team ID

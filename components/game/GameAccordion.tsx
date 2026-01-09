@@ -7,25 +7,7 @@ import { useGameData } from '../../contexts/GameDataContext';
 import { useAuth } from '../../providers/AuthProvider';
 import { PlayerList } from './PlayerList';
 
-// Helper function to format game status display
-const getGameStatusDisplay = (game: any): string => {
-    switch (game.status) {
-        case 'in_progress':
-            return 'Live';
-        case 'completed':
-            return 'Final';
-        case 'scheduled':
-            return 'Game Time';
-        case 'postponed':
-            return 'Postponed';
-        case 'delayed':
-            return 'Delayed';
-        case 'suspended':
-            return 'Suspended';
-        default:
-            return game.status || 'Unknown';
-    }
-};
+
 
 // Helper function to format game time/inning display
 const getGameTimeDisplay = (game: any): string => {
@@ -154,7 +136,7 @@ const GameAccordionComponent: React.FC<GameAccordionProps> = ({
                     </View>
                     <View>
                         <Text>
-                            {getGameStatusDisplay(game)}
+                            {game.statusDisplay}
                         </Text>
                         {getGameTimeDisplay(game) && (
                             <Text>
