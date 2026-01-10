@@ -168,10 +168,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           />
         </View>
         <View style={theme.styles.components.modal.wrapper}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={theme.styles.components.modal.keyboardAvoidingView}
-          >
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <Animated.View
               style={[
                 theme.styles.components.modal.content,

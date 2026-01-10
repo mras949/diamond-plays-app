@@ -202,9 +202,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
         </View>
         <View style={theme.styles.components.modal.wrapper}>
           <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={theme.styles.components.modal.keyboardAvoidingView}
-          >
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <Animated.View
               style={[
                 theme.styles.components.modal.content,
